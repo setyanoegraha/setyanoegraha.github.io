@@ -1,0 +1,6 @@
+# Pengaturan Tema
+remote_theme: pages-themes/minimal@v0.2.0
+
+# Pengaturan Situs Anda
+title: Setyanoegraha's Security Portfolio
+description: Kumpulan writeup CTF, proyek keamanan, dan eksplorasi teknis.
