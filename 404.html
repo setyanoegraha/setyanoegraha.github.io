@@ -2,8 +2,8 @@
 </style></head><body><script>
       window.updateCwd = function (p) {
         var el = document.querySelector(".prompt .cwd");
-        var label = !p || p === "/" ? "~" : "~" + p;
+        var label = p || "/";
         if (el) el.textContent = label;
         document.title = "guest@setyanoegraha:" + label + "$";
       };
-    </script><main><div class="prompt"><span><span class="user">guest</span>@setyanoegraha:<span class="cwd">~</span>$</span><nav><a href="/" title="cd ~">./</a><a href="/proc" title="cd /proc">/proc</a><a href="/usr/bin" title="cd /usr/bin">/usr/bin</a><a href="/var/log" title="cd /var/log">/var/log</a><a class="up" href="https://github.com/setyanoegraha" title="cd ../ (github)">../</a></nav></div><h1 class="cmdline">./404</h1><p><span style="color: var(--red)">bash:</span> ./404: command not found</p><p>The path you requested does not exist on this filesystem.</p><p>Try <code style="color: var(--yellow)">cd ~</code> → <a href="/">return home</a></p></main><footer><span class="exit">exit 0</span> · <a href="mailto:setyanoegraha@example.com">mail -s "hi"</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a></footer></body></html>
+    </script><main><div class="prompt"><span><span class="user">guest</span>@setyanoegraha:<span class="cwd">/?</span>$</span><nav><a href="/" title="cd /">./</a><a href="/proc" title="cd /proc">/proc</a><a href="/usr/bin" title="cd /usr/bin">/usr/bin</a><a href="/var/log" title="cd /var/log">/var/log</a><a class="up" href="https://github.com/setyanoegraha" title="cd ../ (github)">../</a></nav></div><h1 class="cmdline">./404</h1><p><span style="color: var(--red)">bash:</span> ./404: command not found</p><p>The path you requested does not exist on this filesystem.</p><p>Try <code style="color: var(--yellow)">cd /</code> → <a href="/">return home</a></p></main><footer><span class="exit">exit 0</span> · <a href="mailto:setyanoegraha@example.com">mail -s "hi"</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a></footer></body></html>
