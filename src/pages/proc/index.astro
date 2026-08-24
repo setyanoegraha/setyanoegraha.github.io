@@ -1,0 +1,73 @@
+---
+import Terminal from "../../layouts/Terminal.astro";
+
+const processes = [
+  {
+    pid: 1337,
+    cpu: "88.1",
+    cmd: "job-hunt --type=internship",
+    note: "open to IT / cybersecurity internships",
+  },
+  {
+    pid: 2048,
+    cpu: "47.3",
+    cmd: "./hackmyvm --progress=100+",
+    note: "still chewing through remaining machines",
+  },
+  {
+    pid: 4096,
+    cpu: "31.0",
+    cmd: "python ./hackmyvm-cli submit",
+    note: "maintaining my HMV toolkit",
+  },
+  {
+    pid: 5000,
+    cpu: "26.8",
+    cmd: "./build-lab-box --mode=vulnerable",
+    note: "crafting vulnerable boxes for practice",
+  },
+  {
+    pid: 8080,
+    cpu: "12.5",
+    cmd: "study --semester=5",
+    note: "5th semester · Computer Engineering Technology, POLINES",
+  },
+  {
+    pid: 22,
+    cpu: "0.3",
+    cmd: "sshd -D",
+    note: "always listening",
+  },
+];
+---
+<Terminal title="nugraha@setyanoegraha:/proc" path="/proc">
+  <h1 class="cmdline">ps aux | grep nugraha</h1>
+  <div class="ps">
+    <span class="head">USER&nbsp;&nbsp;&nbsp;PID&nbsp;&nbsp;&nbsp;%CPU&nbsp;&nbsp;COMMAND</span>
+    {processes.map((p) => (
+      <div class="row">
+        <span class="user">nugraha</span>
+        <span class="pid">{p.pid}</span>
+        <span class="cpu">{p.cpu}</span>
+        <span class="body">
+          <code>{p.cmd}</code>
+          <em># {p.note}</em>
+        </span>
+      </div>
+    ))}
+  </div>
+
+  <style>
+    .ps { display: flex; flex-direction: column; gap: 0.35rem; }
+    .head, .row { display: grid; grid-template-columns: 4.2rem 3.6rem 3.6rem 1fr; gap: 0.5rem; }
+    .head { color: var(--dim); }
+    .user { color: var(--green); }
+    .pid, .cpu { color: var(--dim); }
+    .body code { color: var(--yellow); display: block; overflow-wrap: anywhere; }
+    .body em { color: var(--dim); font-style: normal; font-size: 0.82rem; }
+    @media (max-width: 560px) {
+      .head { display: none; }
+      .row { grid-template-columns: 1fr; gap: 0; padding-left: 0.75rem; border-left: 2px solid var(--border); }
+    }
+  </style>
+</Terminal>

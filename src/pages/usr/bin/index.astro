@@ -1,0 +1,88 @@
+---
+import Terminal from "../../../layouts/Terminal.astro";
+
+const GITHUB_USER = "setyanoegraha";
+
+// Curated tools only — /usr/bin is for executables you're proud of.
+// Add new tools here manually; stars are fetched automatically at build time.
+const tools = [
+  {
+    name: "hackmyvm-commandlineinterface",
+    description:
+      "A versatile Python-based CLI toolkit for HackMyVM. Search machines, download VMs from MEGA with high-speed progress bars, and submit flags directly from terminal.",
+  },
+];
+
+interface RepoInfo {
+    stargazers_count: number;
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const TOKEN =
+  process.env.GITHUB_TOKEN ?? (import.meta.env.GITHUB_TOKEN as string | undefined);
+let useToken = !!TOKEN && !TOKEN.includes("isi_token");
+
+async function gh<T>(url: string): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const r = await fetch(url, {
+        headers: useToken ? { Authorization: `Bearer ${TOKEN}` } : {},
+      });
+      if (r.ok) return (await r.json()) as T;
+      lastErr = new Error(`HTTP ${r.status}`);
+      if (r.status === 401) {
+        useToken = false;
+        continue;
+      }
+      if (r.status < 500 && r.status !== 429) break;
+    } catch (e) {
+      lastErr = e;
+    }
+    if (attempt < 3) await sleep(2000 * attempt);
+  }
+  throw lastErr;
+}
+
+const enriched = await Promise.all(
+  tools.map(async (t) => {
+    let stars: number | null = null;
+    try {
+      const info = await gh<RepoInfo>(
+        `https://api.github.com/repos/${GITHUB_USER}/${t.name}`
+      );
+      stars = info.stargazers_count;
+    } catch {}
+    return { ...t, url: `https://github.com/${GITHUB_USER}/${t.name}`, stars };
+  })
+);
+---
+<Terminal title="nugraha@setyanoegraha:/usr/bin" path="/usr/bin">
+  <h1 class="cmdline">ls -l /usr/bin</h1>
+  <div id="bins">
+    {enriched.map((t) => (
+      <a class="bin" href={t.url} target="_blank" rel="noopener">
+        <span class="name">./{t.name}</span>
+        {t.stars !== null && <span class="meta">★ {t.stars}</span>}
+        <p>{t.description}</p>
+      </a>
+    ))}
+  </div>
+
+  <style is:global>
+    #bins .bin {
+      display: block;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+      color: var(--fg);
+      transition: border-color 0.15s;
+    }
+    #bins .bin:hover { border-color: var(--green); text-decoration: none; }
+    #bins .bin .name { color: var(--green); font-weight: 600; }
+    #bins .bin .meta { color: var(--yellow); font-size: 0.8rem; margin-left: 0.5rem; }
+    #bins .bin p { margin: 0.35rem 0 0; color: var(--fg); font-size: 0.85rem; line-height: 1.5; }
+  </style>
+</Terminal>

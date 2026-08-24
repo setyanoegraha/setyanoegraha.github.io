@@ -1,0 +1,295 @@
+---
+import Terminal from "../../../layouts/Terminal.astro";
+
+const GITHUB_USER = "setyanoegraha";
+
+interface Repo {
+  name: string;
+  fork: boolean;
+  pushed_at: string;
+  default_branch: string;
+}
+interface Entry {
+  name: string;
+  type: string;
+}
+interface IndexedRepo {
+  name: string;
+  branch: string;
+  prefix: string;
+  machines: string[];
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const TOKEN =
+  process.env.GITHUB_TOKEN ?? (import.meta.env.GITHUB_TOKEN as string | undefined);
+
+let useToken = !!TOKEN && !TOKEN.includes("isi_token");
+
+async function gh<T>(url: string): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const r = await fetch(url, {
+        headers: useToken ? { Authorization: `Bearer ${TOKEN}` } : {},
+      });
+      if (r.ok) return (await r.json()) as T;
+      lastErr = new Error(`HTTP ${r.status} @ ${url}`);
+      if (r.status === 401) {
+        useToken = false;
+        continue;
+      }
+      if (r.status < 500 && r.status !== 429) break;
+    } catch (e) {
+      lastErr = e;
+    }
+    if (attempt < 3) await sleep(2000 * attempt);
+  }
+  throw lastErr;
+}
+
+const SHOWCASED_WRITEUPS = [
+  "hackmyvm-writeups",
+  "vulnyx-writeups",
+  "dockerlabs-writeups",
+];
+
+let repos: IndexedRepo[] = [];
+let error: string | null = null;
+
+try {
+  const all = await gh<Repo[]>(
+    `https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&per_page=100`
+  );
+  const writeups = all
+    .filter((r) => SHOWCASED_WRITEUPS.includes(r.name))
+    .sort((a, b) => b.pushed_at.localeCompare(a.pushed_at));
+
+  for (const repo of writeups) {
+    let entries = await gh<Entry[]>(
+      `https://api.github.com/repos/${GITHUB_USER}/${repo.name}/contents/`
+    );
+    const hasMachinesDir = entries.some(
+      (e) => e.type === "dir" && e.name === "machines"
+    );
+    if (hasMachinesDir) {
+      entries = await gh<Entry[]>(
+        `https://api.github.com/repos/${GITHUB_USER}/${repo.name}/contents/machines`
+      );
+    }
+    repos.push({
+      name: repo.name,
+      branch: repo.default_branch,
+      prefix: hasMachinesDir ? "machines/" : "",
+      machines: entries
+        .filter((e) => e.type === "dir")
+        .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+        .map((e) => e.name),
+    });
+  }
+} catch (e) {
+  error = e instanceof Error ? e.message : String(e);
+}
+---
+<Terminal title="nugraha@setyanoegraha:/var/log" path="/var/log">
+  <div id="varlog-root">
+    <div id="viewer" hidden>
+      <p class="back"><a href="#" id="back-link">&lt; cd ../</a> <span id="viewer-path"></span></p>
+      <article id="article"></article>
+    </div>
+    <div id="logs">
+      <h1 class="cmdline">ls -R /var/log</h1>
+      {error ? (
+        <p class="err">error indexing at build time ({error}) — check your connection and run npm run deploy again.</p>
+      ) : (
+        <div id="index">
+          {repos.map((repo) => (
+            <div class="repo">
+              <h2>
+                {repo.name}.log <span class="count">
+                  — {repo.machines.length === 1 ? "1 entry" : `${repo.machines.length} machines`}
+                </span>
+              </h2>
+              <div class="machines">
+                {repo.machines.map((m) => (
+                  <a
+                    href={`#${repo.name}/${repo.prefix}${m}`}
+                    data-repo={repo.name}
+                    data-branch={repo.branch}
+                    data-dir={m}
+                    data-prefix={repo.prefix}
+                  >{m}</a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <style is:global>
+    #varlog-root .back { margin-bottom: 1rem; }
+    #varlog-root .back a { color: var(--red); }
+    #varlog-root #viewer-path { color: var(--yellow); }
+
+    #varlog-root .repo { margin-bottom: 2rem; }
+    #varlog-root .repo h2 {
+      font-size: 0.95rem;
+      color: var(--yellow);
+      margin: 0 0 0.5rem;
+      font-weight: 600;
+    }
+    #varlog-root .repo h2 .count { color: var(--dim); font-weight: 400; }
+    #varlog-root .machines {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+      gap: 0.25rem 1rem;
+    }
+    #varlog-root .machines a {
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    #varlog-root .machines a::before { content: "> "; color: var(--green); }
+    #varlog-root .machines a:hover { color: var(--green); text-decoration: none; }
+    #varlog-root .err { color: var(--red); }
+
+    #varlog-root #article { line-height: 1.7; font-size: 0.9rem; }
+    #varlog-root #article h1, #varlog-root #article h2 { color: var(--green); border-bottom: 1px dashed var(--border); padding-bottom: 0.3rem; }
+    #varlog-root #article h3, #varlog-root #article h4 { color: var(--blue); }
+    #varlog-root #article code {
+      background: rgba(74, 240, 168, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+      font-size: 0.85em;
+    }
+    #varlog-root #article pre {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.9rem;
+      overflow-x: auto;
+    }
+    #varlog-root #article pre code { background: none; border: none; padding: 0; }
+    #varlog-root #article img { max-width: 100%; border: 1px solid var(--border); border-radius: 6px; }
+    #varlog-root #article table { border-collapse: collapse; }
+    #varlog-root #article th, #varlog-root #article td { border: 1px solid var(--border); padding: 0.35rem 0.6rem; }
+    #varlog-root #article blockquote { border-left: 3px solid var(--green); margin-left: 0; padding-left: 1rem; color: var(--dim); }
+    #varlog-root #article a { color: var(--blue); }
+    #varlog-root #loading { color: var(--dim); }
+  </style>
+
+  <script>
+    import { Marked } from "marked";
+
+    const root = document.getElementById("varlog-root")!;
+    const logsEl = document.getElementById("logs")!;
+    const viewerEl = document.getElementById("viewer")!;
+    const articleEl = document.getElementById("article")!;
+    const viewerPath = document.getElementById("viewer-path")!;
+    const backLink = document.getElementById("back-link")!;
+
+    const GITHUB_USER = "setyanoegraha";
+
+    interface MachineLink {
+      repo: string;
+      branch: string;
+      dir: string;
+      prefix: string;
+    }
+
+    function rawUrl(m: MachineLink, file: string): string {
+      return `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/${file}`;
+    }
+
+    async function openWriteup(m: MachineLink) {
+      const fullPath = `/var/log/${m.repo}/${m.prefix}${m.dir}`;
+      viewerEl.hidden = false;
+      articleEl.innerHTML = `<p id="loading">cat ${m.dir}.md …</p>`;
+      viewerPath.textContent = fullPath;
+      logsEl.hidden = true;
+      window.updateCwd?.(fullPath);
+      window.scrollTo({ top: 0 });
+
+      let md: string | null = null;
+      for (const file of [`${m.dir}.md`, `${m.dir.toLowerCase()}.md`, "README.md"]) {
+        try {
+          const r = await fetch(rawUrl(m, file));
+          if (r.ok) {
+            md = await r.text();
+            break;
+          }
+        } catch {}
+      }
+
+      if (md === null) {
+        articleEl.innerHTML =
+          `<p class="err">cat: ${m.dir}.md: failed to fetch — ` +
+          `<a href="https://github.com/${GITHUB_USER}/${m.repo}/tree/${m.branch}/${m.prefix}${m.dir}" target="_blank" rel="noopener">open on github</a></p>`;
+        return;
+      }
+
+      articleEl.innerHTML = new Marked({
+        walkTokens(token) {
+          if (
+            token.type === "image" &&
+            token.href &&
+            !/^(https?:|data:|#|\/\/)/.test(token.href)
+          ) {
+            const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
+            token.href = base + token.href.split("/").map(encodeURIComponent).join("/");
+          }
+        },
+      }).parse(md, { async: false });
+      history.replaceState(null, "", `#${m.repo}/${m.prefix}${m.dir}`);
+    }
+
+    function showIndex() {
+      viewerEl.hidden = true;
+      logsEl.hidden = false;
+      history.replaceState(null, "", location.pathname + location.search);
+      window.updateCwd?.("/var/log");
+    }
+
+    backLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      showIndex();
+    });
+
+    root.querySelectorAll<HTMLAnchorElement>("#index .machines a").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        openWriteup({
+          repo: a.dataset.repo!,
+          branch: a.dataset.branch!,
+          dir: a.dataset.dir!,
+          prefix: a.dataset.prefix ?? "",
+        });
+      });
+    });
+
+    // deep-link support: /var/log#repo/prefix/Name
+    const hash = decodeURIComponent(location.hash.slice(1));
+    if (hash && hash.includes("/")) {
+      const [repoName, ...rest] = hash.split("/");
+      const dir = rest.pop()!;
+      const prefix = rest.length ? rest.join("/") + "/" : "";
+      const a = [...root.querySelectorAll<HTMLAnchorElement>("#index .machines a")].find(
+        (el) => el.dataset.repo === repoName && el.dataset.dir === dir && (el.dataset.prefix ?? "") === prefix
+      );
+      if (a) {
+        openWriteup({
+          repo: repoName,
+          branch: a.dataset.branch!,
+          dir,
+          prefix,
+        });
+      }
+    }
+  </script>
+</Terminal>
