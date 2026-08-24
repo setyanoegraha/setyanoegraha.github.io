@@ -92,7 +92,7 @@ try {
   error = e instanceof Error ? e.message : String(e);
 }
 ---
-<Terminal title="nugraha@setyanoegraha:/var/log" path="/var/log">
+<Terminal title="setyanoegraha" path="/var/log">
   <div id="varlog-root">
     <div id="viewer" hidden>
       <p class="back"><a href="#" id="back-link">&lt; cd ../</a> <span id="viewer-path"></span></p>
@@ -186,6 +186,7 @@ try {
 
   <script>
     import { Marked } from "marked";
+    import DOMPurify from "dompurify";
 
     const root = document.getElementById("varlog-root")!;
     const logsEl = document.getElementById("logs")!;
@@ -234,18 +235,20 @@ try {
         return;
       }
 
-      articleEl.innerHTML = new Marked({
-        walkTokens(token) {
-          if (
-            token.type === "image" &&
-            token.href &&
-            !/^(https?:|data:|#|\/\/)/.test(token.href)
-          ) {
-            const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
-            token.href = base + token.href.split("/").map(encodeURIComponent).join("/");
-          }
-        },
-      }).parse(md, { async: false });
+      articleEl.innerHTML = DOMPurify.sanitize(
+        new Marked({
+          walkTokens(token) {
+            if (
+              token.type === "image" &&
+              token.href &&
+              !/^(https?:|data:|#|\/\/)/.test(token.href)
+            ) {
+              const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
+              token.href = base + token.href.split("/").map(encodeURIComponent).join("/");
+            }
+          },
+        }).parse(md, { async: false })
+      );
       history.replaceState(null, "", `#${m.repo}/${m.prefix}${m.dir}`);
     }
 

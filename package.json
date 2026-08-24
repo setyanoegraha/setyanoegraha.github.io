@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "astro": "^7.2.4",
+    "dompurify": "^3.4.14",
     "marked": "^18.0.10"
   }
 }
