@@ -3,7 +3,9 @@ name: scheduled deploy
 on:
   schedule:
     - cron: "0 21 * * *" # daily 04:00 WIB
-  workflow_dispatch:
+  workflow_dispatch
+  repository_dispatch:
+    types: [deploy-portfolio]
 
 permissions:
   contents: write
