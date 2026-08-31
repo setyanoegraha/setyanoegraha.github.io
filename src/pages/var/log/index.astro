@@ -99,11 +99,17 @@ try {
       <article id="article"></article>
     </div>
     <div id="logs">
-      <h1 class="cmdline">ls -R /var/log</h1>
       {error ? (
         <p class="err">error indexing at build time ({error}) — check your connection and run npm run deploy again.</p>
       ) : (
         <div id="index">
+          <div id="search" class="cmdline">
+            <span class="find-cmd">find /var/log -type f -name</span>
+            <span class="quote">"</span>
+            <input id="search-input" type="text" placeholder="*" autocomplete="off" spellcheck="false" />
+            <span class="quote">"</span>
+            <span id="match-count"></span>
+          </div>
           {repos.map((repo) => (
             <div class="repo">
               <h2>
@@ -158,25 +164,56 @@ try {
     #varlog-root .machines a:hover { color: var(--green); text-decoration: none; }
     #varlog-root .err { color: var(--red); }
 
+    #varlog-root #search {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 1.5rem 0 1.5rem;
+      font-size: 0.9rem;
+      flex-wrap: wrap;
+    }
+    #varlog-root #search .find-cmd { color: var(--fg); white-space: nowrap; }
+    #varlog-root #search .quote { color: var(--dim); }
+    #varlog-root #search-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--nord8);
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.15rem 0.2rem;
+      flex: 1;
+      max-width: 20rem;
+      min-width: 8rem;
+      outline: none;
+      caret-color: var(--green);
+    }
+    #varlog-root #search-input::placeholder { color: var(--dim); }
+    #varlog-root #search-input:focus { border-bottom-color: var(--accent); }
+    #varlog-root #match-count { color: var(--dim); font-size: 0.8rem; white-space: nowrap; }
+    #varlog-root mark {
+      background: rgba(94, 129, 172, 0.25);
+      color: var(--nord8);
+      padding: 0 1px;
+    }
+
     #varlog-root #article { line-height: 1.7; font-size: 0.9rem; }
-    #varlog-root #article h1, #varlog-root #article h2 { color: var(--green); border-bottom: 1px dashed var(--border); padding-bottom: 0.3rem; }
+    #varlog-root #article h1, #varlog-root #article h2 { color: var(--green); border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
     #varlog-root #article h3, #varlog-root #article h4 { color: var(--blue); }
     #varlog-root #article code {
-      background: rgba(74, 240, 168, 0.08);
+      background: var(--nord1);
       border: 1px solid var(--border);
-      border-radius: 4px;
       padding: 0.1em 0.35em;
       font-size: 0.85em;
     }
     #varlog-root #article pre {
-      background: #0d1117;
+      background: var(--nord1);
       border: 1px solid var(--border);
-      border-radius: 6px;
       padding: 0.9rem;
       overflow-x: auto;
     }
     #varlog-root #article pre code { background: none; border: none; padding: 0; }
-    #varlog-root #article img { max-width: 100%; border: 1px solid var(--border); border-radius: 6px; }
+    #varlog-root #article img { max-width: 100%; border: 1px solid var(--border); }
     #varlog-root #article table { border-collapse: collapse; }
     #varlog-root #article th, #varlog-root #article td { border: 1px solid var(--border); padding: 0.35rem 0.6rem; }
     #varlog-root #article blockquote { border-left: 3px solid var(--green); margin-left: 0; padding-left: 1rem; color: var(--dim); }
@@ -294,5 +331,73 @@ try {
         });
       }
     }
+
+    // --- grep search filter ---
+    const searchInput = document.getElementById("search-input") as HTMLInputElement;
+    const matchCountEl = document.getElementById("match-count")!;
+    const repoBlocks = [...root.querySelectorAll<HTMLElement>("#index .repo")];
+
+    function escapeHtml(s: string): string {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function runSearch() {
+      const q = searchInput.value.trim().toLowerCase();
+      let totalHits = 0;
+      let totalMachines = 0;
+
+      repoBlocks.forEach((block) => {
+        const links = [...block.querySelectorAll<HTMLAnchorElement>(".machines a")];
+        let visible = 0;
+        totalMachines += links.length;
+
+        links.forEach((a) => {
+          const name = a.dataset.dir ?? "";
+          const idx = name.toLowerCase().indexOf(q);
+          if (q === "" || idx >= 0) {
+            (a as HTMLElement).style.display = "";
+            if (q && idx >= 0) {
+              a.innerHTML =
+                escapeHtml(name.slice(0, idx)) +
+                `<mark>${escapeHtml(name.slice(idx, idx + q.length))}</mark>` +
+                escapeHtml(name.slice(idx + q.length));
+              visible++;
+              totalHits++;
+            } else {
+              a.textContent = name;
+            }
+          } else {
+            (a as HTMLElement).style.display = "none";
+          }
+        });
+
+        const countSpan = block.querySelector(".count");
+        if (countSpan) {
+          countSpan.textContent = q
+            ? `— ${visible} / ${links.length} hits`
+            : `— ${links.length === 1 ? "1 entry" : `${links.length} machines`}`;
+        }
+        block.style.display = q && visible === 0 ? "none" : "";
+      });
+
+      matchCountEl.textContent = q ? `${totalHits} / ${totalMachines} hits` : "";
+    }
+
+    searchInput.addEventListener("input", runSearch);
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchInput.value = "";
+        runSearch();
+        searchInput.blur();
+      } else if (e.key === "Enter") {
+        const first = repoBlocks
+          .flatMap((b) => [...b.querySelectorAll<HTMLAnchorElement>(".machines a")])
+          .find((a) => (a as HTMLElement).style.display !== "none");
+        if (first) first.click();
+      }
+    });
+
+    if (!logsEl.hidden) searchInput.focus();
   </script>
 </Terminal>

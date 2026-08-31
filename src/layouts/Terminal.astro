@@ -4,13 +4,13 @@ interface Props {
   path?: string;
 }
 const { title = "setyanoegraha", path = "/" } = Astro.props;
-const nav = [
-  { label: "./", href: "/", cmd: "cd /" },
-  { label: "/proc", href: "/proc", cmd: "cd /proc" },
-  { label: "/usr/bin", href: "/usr/bin", cmd: "cd /usr/bin" },
-  { label: "/var/log", href: "/var/log", cmd: "cd /var/log" },
+const workspaces = [
+  { num: 1, label: "home", href: "/", cmd: "cd /" },
+  { num: 2, label: "proc", href: "/proc", cmd: "cd /proc" },
+  { num: 3, label: "bin", href: "/usr/bin", cmd: "cd /usr/bin" },
+  { num: 4, label: "log", href: "/var/log", cmd: "cd /var/log" },
 ];
-const current = Astro.url.pathname;
+const current = Astro.url.pathname.replace(/\/$/, "") || "/";
 ---
 <!doctype html>
 <html lang="en">
@@ -23,16 +23,39 @@ const current = Astro.url.pathname;
     <title>{title}</title>
     <style is:global>
       :root {
-        --bg: #0a0e14;
-        --fg: #c5c8d6;
-        --dim: #6b7280;
-        --green: #4af0a8;
-        --blue: #7aa2f7;
-        --yellow: #e0af68;
-        --red: #f7768e;
-        --border: #1f2430;
+        --nord0:  #2e3440;
+        --nord1:  #3b4252;
+        --nord2:  #434c5e;
+        --nord3:  #4c566a;
+        --nord4:  #d8dee9;
+        --nord5:  #e5e9f0;
+        --nord6:  #eceff4;
+        --nord7:  #8fbcbb;
+        --nord8:  #88c0d0;
+        --nord9:  #81a1c1;
+        --nord10: #5e81ac;
+        --nord11: #bf616a;
+        --nord12: #d08770;
+        --nord13: #ebcb8b;
+        --nord14: #a3be8c;
+        --nord15: #b48ead;
+
+        --bg:     var(--nord0);
+        --bg-alt: var(--nord1);
+        --fg:     var(--nord4);
+        --dim:    #838a9e;
+        --border: var(--nord2);
+        --green:  var(--nord14);
+        --blue:   var(--nord8);
+        --blue2:  var(--nord9);
+        --accent: var(--nord10);
+        --red:    var(--nord11);
+        --orange: var(--nord12);
+        --yellow: var(--nord13);
+        --purple: var(--nord15);
+        --cyan:   var(--nord7);
       }
-      * { box-sizing: border-box; }
+      * { box-sizing: border-box; border-radius: 0 !important; }
       html { scroll-behavior: smooth; }
       body {
         margin: 0;
@@ -43,53 +66,76 @@ const current = Astro.url.pathname;
         line-height: 1.75;
         -webkit-font-smoothing: antialiased;
       }
-      .window {
-        max-width: 46rem;
-        margin: 2.5rem auto 0;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-      }
-      .titlebar {
+
+      .statusbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
         display: flex;
         align-items: center;
-        padding: 0.5rem 1rem;
-        border-bottom: 1px dashed var(--border);
-        color: var(--dim);
+        justify-content: space-between;
+        background: var(--bg-alt);
+        border-bottom: 1px solid var(--border);
+        padding: 0 0.5rem;
+        height: 2rem;
         font-size: 0.78rem;
+        flex-wrap: wrap;
       }
-      .titlebar .dots { display: inline-flex; gap: 0.45rem; }
-      .titlebar .dot { width: 10px; height: 10px; border-radius: 50%; opacity: 0.8; }
-      .titlebar .dot.r { background: var(--red); }
-      .titlebar .dot.y { background: var(--yellow); }
-      .titlebar .dot.g { background: var(--green); }
-      .titlebar .label { margin: 0 auto; }
+      .statusbar .workspaces {
+        display: flex;
+        gap: 0.15rem;
+      }
+      .statusbar .ws {
+        padding: 0.1rem 0.5rem;
+        color: var(--nord4);
+        opacity: 0.55;
+        text-decoration: none;
+        cursor: pointer;
+        line-height: 1.5;
+      }
+      .statusbar .ws:hover {
+        color: var(--nord4);
+        opacity: 0.85;
+        text-decoration: none;
+      }
+      .statusbar .ws[aria-current="page"] {
+        background: var(--accent);
+        color: var(--nord6);
+        font-weight: 600;
+        opacity: 1;
+      }
+      .statusbar .sysinfo {
+        display: flex;
+        gap: 0.75rem;
+        color: var(--nord5);
+      }
+      .statusbar .sysinfo .host { color: var(--nord5); }
+      .statusbar .sysinfo .clock { color: var(--nord5); }
+
+      .terminal {
+        max-width: 52rem;
+        margin: 0 auto;
+      }
       main {
         padding: 2rem 1.25rem 3rem;
       }
       a { color: var(--blue); text-decoration: none; }
       a:hover { text-decoration: underline; text-underline-offset: 3px; }
-      ::selection { background: var(--green); color: var(--bg); }
+      ::selection { background: var(--accent); color: var(--nord6); }
 
       .prompt {
         color: var(--dim);
         font-size: 0.85rem;
         padding-bottom: 1.5rem;
-        border-bottom: 1px dashed var(--border);
+        border-bottom: 1px solid var(--border);
         margin-bottom: 2rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25rem 1rem;
-        align-items: baseline;
       }
-      .prompt .user { color: var(--green); }
-      .prompt .sep { color: var(--dim); }
+      .prompt .user { color: var(--green); font-weight: 600; }
+      .prompt .at { color: var(--dim); }
+      .prompt .host { color: var(--blue2); font-weight: 600; }
+      .prompt .colon { color: var(--dim); }
       .prompt .cwd { color: var(--blue); }
-      .prompt nav { display: inline-flex; flex-wrap: wrap; gap: 0.9rem; }
-      .prompt nav a { color: var(--fg); font-weight: 500; }
-      .prompt nav a:hover { color: var(--green); text-decoration: none; }
-      .prompt nav a[aria-current="page"] { color: var(--yellow); }
-      .prompt .up { color: var(--red); }
-      .prompt .up:hover { color: var(--fg); }
+      .prompt .dollar { color: var(--green); }
 
       .cmdline { margin: 1.5rem 0 0.75rem; }
       .cmdline::before { content: "$ "; color: var(--green); }
@@ -100,14 +146,15 @@ const current = Astro.url.pathname;
         padding: 1.5rem 1.25rem 2.5rem;
         color: var(--dim);
         font-size: 0.8rem;
-        border-top: 1px dashed var(--border);
+        border-top: 1px solid var(--border);
       }
-      footer .last-login { margin: 0 0 0.5rem; }
       footer .contact { margin: 0; }
       footer .exit { color: var(--green); }
+
       @media (max-width: 480px) {
         body { font-size: 13.5px; }
-        .window { margin-top: 1rem; }
+        .statusbar { height: auto; padding: 0.25rem 0.5rem; }
+        .statusbar .sysinfo .clock { display: none; }
       }
     </style>
   </head>
@@ -120,30 +167,48 @@ const current = Astro.url.pathname;
         document.title = "setyanoegraha";
       };
     </script>
-    <div class="window">
-      <div class="titlebar">
-        <span class="dots">
-          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-        </span>
-        <span class="label">nugraha@setyanoegraha — bash</span>
+    <div class="statusbar">
+      <div class="workspaces">
+        {workspaces.map((ws) => (
+          <a class="ws" href={ws.href} aria-current={current === ws.href ? "page" : undefined} title={ws.cmd}>
+            {ws.num}:{ws.label}
+          </a>
+        ))}
       </div>
-      <main>
-      <div class="prompt">
-        <span><span class="user">nugraha</span>@setyanoegraha:<span class="cwd">{path}</span>$</span>
-        <nav>
-          {nav.map((item) => (
-            <a href={item.href} aria-current={current === item.href ? "page" : undefined} title={item.cmd}>{item.label}</a>
-          ))}
-          <a class="up" href="https://github.com/setyanoegraha" title="cd ../ (github)">../</a>
-        </nav>
+      <div class="sysinfo">
+        <span class="host">setyanoegraha</span>
+        <span class="clock" id="clock">--:--</span>
       </div>
-      <slot />
-    </main>
-    <footer>
-      <p class="contact">
-        <span class="exit">exit 0</span> · <a href="mailto:pandu4688@gmail.com">mail</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a> · <a href="https://github.com/setyanoegraha">github</a>
-      </p>
-    </footer>
     </div>
+    <div class="terminal">
+      <main>
+        <div class="prompt">
+          <span class="user">nugraha</span><span class="at">@</span><span class="host">setyanoegraha</span><span class="colon">:</span><span class="cwd">{path}</span><span class="dollar">$</span>
+        </div>
+        <slot />
+      </main>
+      <footer>
+        <p class="contact">
+          <span class="exit">exit 0</span> · <a href="mailto:pandu4688@gmail.com">mail</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a> · <a href="https://github.com/setyanoegraha">github</a>
+        </p>
+      </footer>
+    </div>
+    <script is:inline>
+      (function () {
+        function updateClock() {
+          var el = document.getElementById("clock");
+          if (!el) return;
+          var fmt = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Jakarta",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          el.textContent = fmt.format(new Date()) + " WIB";
+        }
+        updateClock();
+        setInterval(updateClock, 30000);
+      })();
+    </script>
   </body>
 </html>
