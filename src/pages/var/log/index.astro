@@ -83,7 +83,7 @@ try {
       branch: repo.default_branch,
       prefix: hasMachinesDir ? "machines/" : "",
       machines: entries
-        .filter((e) => e.type === "dir")
+        .filter((e) => e.type === "dir" && !e.name.startsWith("."))
         .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
         .map((e) => e.name),
     });
