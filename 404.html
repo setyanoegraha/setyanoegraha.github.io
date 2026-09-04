@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="setyanoegraha — security writeups, tools and projects."><link rel="icon" href="https://github.com/setyanoegraha.png"><meta name="referrer" content="no-referrer"><title>setyanoegraha</title><style>:root{--nord0:#2e3440;--nord1:#3b4252;--nord2:#434c5e;--nord3:#4c566a;--nord4:#d8dee9;--nord5:#e5e9f0;--nord6:#eceff4;--nord7:#8fbcbb;--nord8:#88c0d0;--nord9:#81a1c1;--nord10:#5e81ac;--nord11:#bf616a;--nord12:#d08770;--nord13:#ebcb8b;--nord14:#a3be8c;--nord15:#b48ead;--bg:var(--nord0);--bg-alt:var(--nord1);--fg:var(--nord4);--dim:#838a9e;--border:var(--nord2);--green:var(--nord14);--blue:var(--nord8);--blue2:var(--nord9);--accent:var(--nord10);--red:var(--nord11);--orange:var(--nord12);--yellow:var(--nord13);--purple:var(--nord15);--cyan:var(--nord7)}*{box-sizing:border-box;border-radius:0!important}html{scroll-behavior:smooth}body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;margin:0;font-family:ui-monospace,JetBrains Mono,Fira Code,Cascadia Code,Menlo,Consolas,monospace;font-size:15px;line-height:1.75}.statusbar{z-index:100;background:var(--bg-alt);border-bottom:1px solid var(--border);flex-wrap:wrap;justify-content:space-between;align-items:center;height:2rem;padding:0 .5rem;font-size:.78rem;display:flex;position:sticky;top:0}.statusbar .workspaces{gap:.15rem;display:flex}.statusbar .ws{color:var(--nord4);opacity:.55;cursor:pointer;padding:.1rem .5rem;line-height:1.5;text-decoration:none}.statusbar .ws:hover{color:var(--nord4);opacity:.85;text-decoration:none}.statusbar .ws[aria-current=page]{background:var(--accent);color:var(--nord6);opacity:1;font-weight:600}.statusbar .sysinfo{color:var(--nord5);gap:.75rem;display:flex}.statusbar .sysinfo .host,.statusbar .sysinfo .clock{color:var(--nord5)}.terminal{max-width:52rem;margin:0 auto}main{padding:2rem 1.25rem 3rem}a{color:var(--blue);text-decoration:none}a:hover{text-underline-offset:3px;text-decoration:underline}::selection{background:var(--accent);color:var(--nord6)}.prompt{color:var(--dim);border-bottom:1px solid var(--border);margin-bottom:2rem;padding-bottom:1.5rem;font-size:.85rem}.prompt .user{color:var(--green);font-weight:600}.prompt .at{color:var(--dim)}.prompt .host{color:var(--blue2);font-weight:600}.prompt .colon{color:var(--dim)}.prompt .cwd{color:var(--blue)}.prompt .dollar{color:var(--green)}.cmdline{margin:1.5rem 0 .75rem}.cmdline:before{content:"$ ";color:var(--green)}h1.cmdline{font-size:1.05rem;font-weight:600}h2.cmdline{font-size:1rem;font-weight:600}footer{color:var(--dim);border-top:1px solid var(--border);padding:1.5rem 1.25rem 2.5rem;font-size:.8rem}footer .contact{margin:0}footer .exit{color:var(--green)}@media (width<=480px){body{font-size:13.5px}.statusbar{height:auto;padding:.25rem .5rem}.statusbar .sysinfo .clock{display:none}}
+</style></head><body><script>
+      window.updateCwd = function (p) {
+        var el = document.querySelector(".prompt .cwd");
+        var label = p || "/";
+        if (el) el.textContent = label;
+        document.title = "setyanoegraha";
+      };
+    </script><div class="statusbar"><div class="workspaces"><a class="ws" href="/" title="cd /">1:home</a><a class="ws" href="/proc" title="cd /proc">2:proc</a><a class="ws" href="/usr/bin" title="cd /usr/bin">3:bin</a><a class="ws" href="/var/log" title="cd /var/log">4:log</a></div><div class="sysinfo"><span class="host">setyanoegraha</span><span class="clock" id="clock">--:--</span></div></div><div class="terminal"><main><div class="prompt"><span class="user">nugraha</span><span class="at">@</span><span class="host">setyanoegraha</span><span class="colon">:</span><span class="cwd">/?</span><span class="dollar">$</span></div><h1 class="cmdline">./404</h1><p><span style="color: var(--red)">bash:</span> ./404: command not found</p><p>The path you requested does not exist on this filesystem.</p><p>Try <code style="color: var(--yellow)">cd /</code> → <a href="/">return home</a></p></main><footer><p class="contact"><span class="exit">exit 0</span> · <a href="mailto:pandu4688@gmail.com">mail</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a> · <a href="https://github.com/setyanoegraha">github</a></p></footer></div><script>
+      (function () {
+        function updateClock() {
+          var el = document.getElementById("clock");
+          if (!el) return;
+          var fmt = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Jakarta",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          el.textContent = fmt.format(new Date()) + " WIB";
+        }
+        updateClock();
+        setInterval(updateClock, 30000);
+      })();
+    </script></body></html>
