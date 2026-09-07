@@ -281,7 +281,11 @@ try {
               !/^(https?:|data:|#|\/\/)/.test(token.href)
             ) {
               const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
-              token.href = base + token.href.split("/").map(encodeURIComponent).join("/");
+              // resolve relative to the machine dir; legacy refs like "machines/X/image.png" or
+              // "../agent/images/img.png" from pre-normalization writeups are stripped/joined safely
+              let rel = token.href.replace(/^\.\//, "");
+              rel = rel.replace(/^machines\/[^/]+\//, "");
+              token.href = base + rel.split("/").map(encodeURIComponent).join("/");
             }
           },
         }).parse(md, { async: false })
