@@ -20,6 +20,17 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
     <meta name="description" content="setyanoegraha — security writeups, tools and projects." />
     <link rel="icon" href="https://github.com/setyanoegraha.png" />
     <meta name="referrer" content="no-referrer" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="setyanoegraha" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content="security writeups, tools and projects — presented as a terminal" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:image" content="https://github.com/setyanoegraha.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content="security writeups, tools and projects — presented as a terminal" />
+    <meta name="twitter:image" content="https://github.com/setyanoegraha.png" />
+    <link rel="canonical" href={Astro.url} />
     <title>{title}</title>
     <style is:global>
       :root {

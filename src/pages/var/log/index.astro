@@ -213,6 +213,11 @@ try {
       overflow-x: auto;
     }
     #varlog-root #article pre code { background: none; border: none; padding: 0; }
+    #varlog-root #article pre code.hljs {
+      background: none;
+      padding: 0;
+      color: var(--nord4);
+    }
     #varlog-root #article img { max-width: 100%; border: 1px solid var(--border); }
     #varlog-root #article table { border-collapse: collapse; }
     #varlog-root #article th, #varlog-root #article td { border: 1px solid var(--border); padding: 0.35rem 0.6rem; }
@@ -223,6 +228,9 @@ try {
 
   <script>
     import { Marked } from "marked";
+    import { markedHighlight } from "marked-highlight";
+    import hljs from "highlight.js/lib/common";
+    import "highlight.js/styles/nord.css";
     import DOMPurify from "dompurify";
 
     const root = document.getElementById("varlog-root")!;
@@ -273,22 +281,32 @@ try {
       }
 
       articleEl.innerHTML = DOMPurify.sanitize(
-        new Marked({
-          walkTokens(token) {
-            if (
-              token.type === "image" &&
-              token.href &&
-              !/^(https?:|data:|#|\/\/)/.test(token.href)
-            ) {
-              const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
-              // resolve relative to the machine dir; legacy refs like "machines/X/image.png" or
-              // "../agent/images/img.png" from pre-normalization writeups are stripped/joined safely
-              let rel = token.href.replace(/^\.\//, "");
-              rel = rel.replace(/^machines\/[^/]+\//, "");
-              token.href = base + rel.split("/").map(encodeURIComponent).join("/");
-            }
-          },
-        }).parse(md, { async: false })
+        new Marked(
+          markedHighlight({
+            emptyLangClass: "hljs",
+            langPrefix: "hljs language-",
+            highlight(code, lang) {
+              const language = hljs.getLanguage(lang) ? lang : "plaintext";
+              return hljs.highlight(code, { language }).value;
+            },
+          }),
+          {
+            walkTokens(token) {
+              if (
+                token.type === "image" &&
+                token.href &&
+                !/^(https?:|data:|#|\/\/)/.test(token.href)
+              ) {
+                const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
+                // resolve relative to the machine dir; legacy refs like "machines/X/image.png" or
+                // "../agent/images/img.png" from pre-normalization writeups are stripped/joined safely
+                let rel = token.href.replace(/^\.\//, "");
+                rel = rel.replace(/^machines\/[^/]+\//, "");
+                token.href = base + rel.split("/").map(encodeURIComponent).join("/");
+              }
+            },
+          }
+        ).parse(md, { async: false })
       );
       history.replaceState(null, "", `#${m.repo}/${m.prefix}${m.dir}`);
     }
