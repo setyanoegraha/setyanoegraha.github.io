@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://setyanoegraha.github.io/sitemap.xml
