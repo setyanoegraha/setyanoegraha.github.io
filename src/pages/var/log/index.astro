@@ -462,7 +462,8 @@ const zipManifest = repos.map((r) => ({
         const manifest = allManifests.find((z: any) => z.repo === repoName);
         if (!manifest) return;
         try {
-          const zip = new JSZip();
+          const ZipConstructor: any = (JSZip as any).default || JSZip;
+          const zip = new ZipConstructor();
           await Promise.all(manifest.files.map(async (f) => {
             const r = await fetch(f.url);
             if (r.ok) zip.file(f.name, await r.text());
