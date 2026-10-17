@@ -226,11 +226,47 @@ const zipManifest = repos.map((r) => ({
       padding: 0.1em 0.35em;
       font-size: 0.85em;
     }
+    #varlog-root #article .code-block-wrapper {
+      position: relative;
+      margin: 1rem 0;
+    }
     #varlog-root #article pre {
       background: var(--nord1);
       border: 1px solid var(--border);
       padding: 0.9rem;
+      padding-top: 1rem;
+      padding-right: 4.5rem;
       overflow-x: auto;
+      margin: 0;
+    }
+    #varlog-root #article .code-block-wrapper .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--nord0);
+      border: 1px solid var(--border);
+      color: var(--dim);
+      font-family: inherit;
+      font-size: 0.72rem;
+      line-height: 1;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      opacity: 0.7;
+      user-select: none;
+      z-index: 5;
+      transition: opacity 0.15s, border-color 0.15s, color 0.15s;
+    }
+    #varlog-root #article .code-block-wrapper:hover .copy-btn {
+      opacity: 1;
+    }
+    #varlog-root #article .code-block-wrapper .copy-btn:hover {
+      border-color: var(--blue);
+      color: var(--fg);
+    }
+    #varlog-root #article .code-block-wrapper .copy-btn.copied {
+      opacity: 1;
+      border-color: var(--green);
+      color: var(--green);
     }
     #varlog-root #article pre code { background: none; border: none; padding: 0; }
     #varlog-root #article pre code.hljs {
@@ -396,6 +432,7 @@ const zipManifest = repos.map((r) => ({
         }).parse(md, { async: false })
       );
       buildToc();
+      attachCopyButtons();
       history.replaceState(null, "", `#${m.repo}/${m.prefix}${m.dir}`);
     }
 
@@ -422,6 +459,68 @@ const zipManifest = repos.map((r) => ({
         tocEl.appendChild(a);
       }
     }
+
+    async function copyToClipboard(text: string): Promise<boolean> {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {}
+      }
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const successful = document.execCommand("copy");
+        document.body.removeChild(textarea);
+        return successful;
+      } catch {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      const pres = articleEl.querySelectorAll("pre");
+      pres.forEach((pre) => {
+        if (pre.parentElement?.classList.contains("code-block-wrapper")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "code-block-wrapper";
+        pre.parentNode?.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "copy-btn";
+        btn.setAttribute("aria-label", "Copy code");
+        btn.textContent = "copy";
+
+        btn.addEventListener("click", async () => {
+          const code = pre.querySelector("code");
+          const text = (code ? code.innerText : pre.innerText).replace(/\n$/, "");
+          const ok = await copyToClipboard(text);
+          if (ok) {
+            btn.textContent = "copied!";
+            btn.classList.add("copied");
+            setTimeout(() => {
+              btn.textContent = "copy";
+              btn.classList.remove("copied");
+            }, 2000);
+          } else {
+            btn.textContent = "failed";
+            setTimeout(() => {
+               btn.textContent = "copy";
+             }, 2000);
+           }
+         });
+
+         wrapper.appendChild(btn);
+       });
+     }
 
     function showIndex() {
       viewerEl.hidden = true;
