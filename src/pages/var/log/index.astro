@@ -91,12 +91,30 @@ try {
 } catch (e) {
   error = e instanceof Error ? e.message : String(e);
 }
+const zipManifest = repos.map((r) => ({
+  repo: r.name,
+  branch: r.branch,
+  files: r.machines.flatMap((m) => {
+    const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${r.name}/${r.branch}/${r.prefix}${m}/`;
+    return [
+      { name: `${m}/${m}.md`, url: base + `${m}.md` },
+      { name: `${m}/${m.toLowerCase()}.md`, url: base + `${m.toLowerCase()}.md` },
+      { name: `${m}/README.md`, url: base + `README.md` },
+    ];
+  }).filter((f, i, arr) => arr.findIndex((x) => x.url === f.url) === i),
+}));
 ---
 <Terminal title="setyanoegraha" path="/var/log">
   <div id="varlog-root">
     <div id="viewer" hidden>
       <p class="back"><a href="#" id="back-link">&lt; cd ../</a> <span id="viewer-path"></span></p>
-      <article id="article"></article>
+      <div id="viewer-body">
+        <aside id="toc-pane" hidden>
+          <p class="toc-title">cat /toc</p>
+          <nav id="toc-list"></nav>
+        </aside>
+        <article id="article"></article>
+      </div>
     </div>
     <div id="logs">
       {error ? (
@@ -117,6 +135,7 @@ try {
                   — {repo.machines.length === 1 ? "1 entry" : `${repo.machines.length} machines`}
                 </span>
               </h2>
+              <button class="export-zip" data-repo={repo.name}>wget -r {repo.name}</button>
               <div class="machines">
                 {repo.machines.map((m) => (
                   <a
@@ -133,6 +152,7 @@ try {
         </div>
       )}
     </div>
+    <script id="zip-manifest-data" type="application/json" set:html={JSON.stringify(zipManifest)}></script>
   </div>
 
   <style is:global>
@@ -224,6 +244,65 @@ try {
     #varlog-root #article blockquote { border-left: 3px solid var(--green); margin-left: 0; padding-left: 1rem; color: var(--dim); }
     #varlog-root #article a { color: var(--blue); }
     #varlog-root #loading { color: var(--dim); }
+    #varlog-root #viewer-body {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+    #varlog-root #toc-pane {
+      position: sticky;
+      top: 2.5rem;
+      width: 13rem;
+      flex-shrink: 0;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      border-left: 1px solid var(--border);
+      padding-left: 0.75rem;
+    }
+    #varlog-root #toc-pane .toc-title {
+      color: var(--dim);
+      margin: 0 0 0.5rem;
+      font-size: 0.72rem;
+    }
+    #varlog-root #toc-pane #toc-list { display: flex; flex-direction: column; gap: 0.15rem; }
+    #varlog-root #toc-pane a {
+      color: var(--nord4);
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+    #varlog-root #toc-pane a:hover { color: var(--green); }
+    #varlog-root #toc-pane .toc-h1 { color: var(--yellow); font-weight: 600; }
+    #varlog-root #toc-pane .toc-h2 { padding-left: 0.5rem; }
+    #varlog-root #toc-pane .toc-h3 { padding-left: 1rem; color: var(--dim); font-size: 0.72rem; }
+    #varlog-root #article h1, #varlog-root #article h2, #varlog-root #article h3 {
+      scroll-margin-top: 2.5rem;
+    }
+    @media (max-width: 900px) {
+      #varlog-root #viewer-body { flex-direction: column; }
+      #varlog-root #toc-pane {
+        position: static;
+        width: 100%;
+        max-height: 12rem;
+        border-left: none;
+        border-bottom: 1px solid var(--border);
+        padding-left: 0;
+        padding-bottom: 0.75rem;
+      }
+    }
+    #varlog-root .export-zip {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--nord4);
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      cursor: pointer;
+      margin-bottom: 0.6rem;
+    }
+    #varlog-root .export-zip:hover { border-color: var(--green); color: var(--green); }
+    #varlog-root .export-zip:disabled { opacity: 0.5; cursor: wait; }
   </style>
 
   <script>
@@ -232,12 +311,14 @@ try {
     import hljs from "highlight.js/lib/common";
     import "highlight.js/styles/nord.css";
     import DOMPurify from "dompurify";
+    import JSZip from "jszip";
 
     const root = document.getElementById("varlog-root")!;
     const logsEl = document.getElementById("logs")!;
     const viewerEl = document.getElementById("viewer")!;
     const articleEl = document.getElementById("article")!;
     const viewerPath = document.getElementById("viewer-path")!;
+    const tocPane = document.getElementById("toc-pane")!;
     const backLink = document.getElementById("back-link")!;
 
     const GITHUB_USER = "setyanoegraha";
@@ -305,15 +386,52 @@ try {
                 token.href = base + rel.split("/").map(encodeURIComponent).join("/");
               }
             },
-          }
-        ).parse(md, { async: false })
+          renderer: {
+            heading(token) {
+              const inline = this.parser.parseInline(token.tokens);
+              const slug = inline
+                .toLowerCase()
+                .replace(/<[^>]+>/g, "")
+                .replace(/[^\w\s-]/g, "")
+                .trim()
+                .replace(/\s+/g, "-");
+              return `<h${token.depth} id="${slug}">${inline}</h${token.depth}>`;
+            },
+          },
+        }).parse(md, { async: false })
       );
+      buildToc();
       history.replaceState(null, "", `#${m.repo}/${m.prefix}${m.dir}`);
+    }
+
+    function buildToc() {
+      const tocEl = document.getElementById("toc-list")!;
+      tocEl.innerHTML = "";
+      const heads = [...articleEl.querySelectorAll("h1, h2, h3")];
+      if (heads.length === 0) {
+        tocPane.hidden = true;
+        return;
+      }
+      tocPane.hidden = false;
+      for (const h of heads) {
+        if (!h.id) continue;
+        const a = document.createElement("a");
+        a.href = "#" + h.id;
+        a.textContent = h.textContent || "";
+        a.className = "toc-" + h.tagName.toLowerCase();
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          h.scrollIntoView({ behavior: "smooth", block: "start" });
+          history.replaceState(null, "", "#" + h.id);
+        });
+        tocEl.appendChild(a);
+      }
     }
 
     function showIndex() {
       viewerEl.hidden = true;
       logsEl.hidden = false;
+      tocPane.hidden = true;
       history.replaceState(null, "", location.pathname + location.search);
       window.updateCwd?.("/var/log");
     }
@@ -332,6 +450,41 @@ try {
           dir: a.dataset.dir!,
           prefix: a.dataset.prefix ?? "",
         });
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>("button.export-zip").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const repoName = btn.dataset.repo!;
+        btn.disabled = true;
+        btn.textContent = "downloading…";
+        const allManifests = JSON.parse(document.getElementById("zip-manifest-data")?.textContent || "[]");
+        const manifest = allManifests.find((z: any) => z.repo === repoName);
+        if (!manifest) return;
+        try {
+          const zip = new JSZip();
+          await Promise.all(manifest.files.map(async (f) => {
+            const r = await fetch(f.url);
+            if (r.ok) zip.file(f.name, await r.text());
+          }));
+          const blob = await zip.generateAsync({ type: "blob" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${repoName}-writeups.zip`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
+          btn.textContent = "wget -r " + repoName;
+        } catch (e: any) {
+          console.error("export error:", e);
+          btn.textContent = `error (${e?.message || "retry"})`;
+        } finally {
+          btn.disabled = false;
+        }
       });
     });
 

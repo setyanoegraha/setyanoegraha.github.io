@@ -13,6 +13,7 @@
     "astro": "^7.2.4",
     "dompurify": "^3.4.14",
     "highlight.js": "^11.12.0",
+    "jszip": "^3.10.2",
     "marked": "^18.0.10",
     "marked-highlight": "^2.2.4"
   }
