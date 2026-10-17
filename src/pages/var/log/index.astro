@@ -109,11 +109,11 @@ const zipManifest = repos.map((r) => ({
     <div id="viewer" hidden>
       <p class="back"><a href="#" id="back-link">&lt; cd ../</a> <span id="viewer-path"></span></p>
       <div id="viewer-body">
+        <article id="article"></article>
         <aside id="toc-pane" hidden>
           <p class="toc-title">cat /toc</p>
           <nav id="toc-list"></nav>
         </aside>
-        <article id="article"></article>
       </div>
     </div>
     <div id="logs">
@@ -245,28 +245,30 @@ const zipManifest = repos.map((r) => ({
     #varlog-root #article a { color: var(--blue); }
     #varlog-root #loading { color: var(--dim); }
     #varlog-root #viewer-body {
-      display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
+      position: relative;
+    }
+    #varlog-root #article {
+      width: 100%;
     }
     #varlog-root #toc-pane {
-      position: sticky;
-      top: 2.5rem;
-      width: 13rem;
-      flex-shrink: 0;
-      max-height: calc(100vh - 4rem);
+      position: fixed;
+      top: 5rem;
+      left: calc(50% + 27rem);
+      width: 14rem;
+      max-height: calc(100vh - 7rem);
       overflow-y: auto;
       font-size: 0.78rem;
       line-height: 1.5;
       border-left: 1px solid var(--border);
-      padding-left: 0.75rem;
+      padding-left: 0.85rem;
+      z-index: 50;
     }
     #varlog-root #toc-pane .toc-title {
       color: var(--dim);
       margin: 0 0 0.5rem;
       font-size: 0.72rem;
     }
-    #varlog-root #toc-pane #toc-list { display: flex; flex-direction: column; gap: 0.15rem; }
+    #varlog-root #toc-pane #toc-list { display: flex; flex-direction: column; gap: 0.2rem; }
     #varlog-root #toc-pane a {
       color: var(--nord4);
       text-decoration: none;
@@ -279,16 +281,9 @@ const zipManifest = repos.map((r) => ({
     #varlog-root #article h1, #varlog-root #article h2, #varlog-root #article h3 {
       scroll-margin-top: 2.5rem;
     }
-    @media (max-width: 900px) {
-      #varlog-root #viewer-body { flex-direction: column; }
+    @media (max-width: 1240px) {
       #varlog-root #toc-pane {
-        position: static;
-        width: 100%;
-        max-height: 12rem;
-        border-left: none;
-        border-bottom: 1px solid var(--border);
-        padding-left: 0;
-        padding-bottom: 0.75rem;
+        display: none !important;
       }
     }
     #varlog-root .export-zip {
