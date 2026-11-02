@@ -104,7 +104,7 @@ const zipManifest = repos.map((r) => ({
   }).filter((f, i, arr) => arr.findIndex((x) => x.url === f.url) === i),
 }));
 ---
-<Terminal title="setyanoegraha" path="/var/log">
+<Terminal path="/var/log">
   <div id="varlog-root">
     <div id="viewer" hidden>
       <p class="back"><a href="#" id="back-link">&lt; cd ../</a> <span id="viewer-path"></span></p>
@@ -125,7 +125,7 @@ const zipManifest = repos.map((r) => ({
           <div id="search" class="cmdline">
             <span class="find-cmd">find /var/log -type f -name</span>
             <span class="quote">"</span>
-            <input id="search-input" type="text" placeholder="*" autocomplete="off" spellcheck="false" />
+            <input id="search-input" type="text" placeholder="*" autocomplete="off" spellcheck="false" aria-label="filter machines" />
             <span class="quote">"</span>
             <span id="match-count"></span>
           </div>
@@ -283,6 +283,33 @@ const zipManifest = repos.map((r) => ({
       padding: 0;
       color: var(--nord4);
     }
+    #varlog-root #article .hljs-comment,
+    #varlog-root #article .hljs-quote,
+    #varlog-root #article .hljs-meta { color: var(--dim); }
+    #varlog-root #article .hljs-keyword,
+    #varlog-root #article .hljs-selector-tag,
+    #varlog-root #article .hljs-literal,
+    #varlog-root #article .hljs-symbol,
+    #varlog-root #article .hljs-name { color: var(--blue); }
+    #varlog-root #article .hljs-string,
+    #varlog-root #article .hljs-doctag,
+    #varlog-root #article .hljs-addition { color: var(--green); }
+    #varlog-root #article .hljs-number,
+    #varlog-root #article .hljs-regexp,
+    #varlog-root #article .hljs-meta .hljs-string { color: var(--yellow); }
+    #varlog-root #article .hljs-title,
+    #varlog-root #article .hljs-section,
+    #varlog-root #article .hljs-built_in,
+    #varlog-root #article .hljs-type,
+    #varlog-root #article .hljs-selector-class,
+    #varlog-root #article .hljs-selector-id { color: var(--cyan); }
+    #varlog-root #article .hljs-attr,
+    #varlog-root #article .hljs-attribute,
+    #varlog-root #article .hljs-variable,
+    #varlog-root #article .hljs-template-variable { color: var(--fg); }
+    #varlog-root #article .hljs-deletion { color: var(--red); }
+    #varlog-root #article .hljs-emphasis { font-style: italic; }
+    #varlog-root #article .hljs-strong { font-weight: 700; }
     #varlog-root #article img { max-width: 100%; border: 1px solid var(--border); }
     #varlog-root #article table { border-collapse: collapse; }
     #varlog-root #article th, #varlog-root #article td { border: 1px solid var(--border); padding: 0.35rem 0.6rem; }
@@ -330,7 +357,7 @@ const zipManifest = repos.map((r) => ({
     #varlog-root #article h1, #varlog-root #article h2, #varlog-root #article h3 {
       scroll-margin-top: 2.5rem;
     }
-    @media (max-width: 1240px) {
+    @media (max-width: 1340px) {
       #varlog-root #viewer-body { display: flex; flex-direction: column; }
       #varlog-root #toc-pane {
         position: static;
@@ -379,7 +406,6 @@ const zipManifest = repos.map((r) => ({
     import { Marked } from "marked";
     import { markedHighlight } from "marked-highlight";
     import hljs from "highlight.js/lib/common";
-    import "highlight.js/styles/nord.css";
     import DOMPurify from "dompurify";
     import JSZip from "jszip";
 

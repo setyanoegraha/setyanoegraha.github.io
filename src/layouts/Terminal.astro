@@ -1,9 +1,9 @@
 ---
 interface Props {
-  title?: string;
   path?: string;
 }
-const { title = "setyanoegraha", path = "/" } = Astro.props;
+const { path = "/" } = Astro.props;
+const fullTitle = path === "/" ? "setyanoegraha" : `setyanoegraha · ${path}`;
 const workspaces = [
   { num: 1, label: "home", href: "/", cmd: "cd /" },
   { num: 2, label: "proc", href: "/proc", cmd: "cd /proc" },
@@ -23,16 +23,16 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
     <meta name="referrer" content="no-referrer" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="setyanoegraha" />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content="security writeups, tools and projects — presented as a terminal" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:image" content="https://github.com/setyanoegraha.png" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content="security writeups, tools and projects — presented as a terminal" />
     <meta name="twitter:image" content="https://github.com/setyanoegraha.png" />
     <link rel="canonical" href={Astro.url} />
-    <title>{title}</title>
+    <title>{fullTitle}</title>
     <script is:inline>
       (function () {
         var saved = localStorage.getItem("theme");
@@ -50,12 +50,9 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
         --nord2:  #d8dee9;
         --nord3:  #4c566a;
         --nord4:  #2e3440;
-        --nord5:  #2e3440;
-        --nord6:  #eceff4;
         --nord7:  #2f6b70;
         --nord8:  #3a6b94;
         --nord9:  #44698f;
-        --nord10: #3a6b94;
         --nord11: #a03b45;
         --nord12: #8a5127;
         --nord13: #7a5a1e;
@@ -76,7 +73,6 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
         --red:     var(--nord11);
         --orange:  var(--nord12);
         --yellow:  var(--nord13);
-        --purple:  var(--nord15);
         --cyan:    var(--nord7);
       }
 
@@ -87,12 +83,9 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
         --nord2:  #434c5e;
         --nord3:  #a8b0c0;
         --nord4:  #d8dee9;
-        --nord5:  #e5e9f0;
-        --nord6:  #eceff4;
         --nord7:  #8fbcbb;
         --nord8:  #88c0d0;
         --nord9:  #9db4cd;
-        --nord10: #4a6484;
         --nord11: #e2a2a8;
         --nord12: #dda483;
         --nord13: #ebcb8b;
@@ -113,7 +106,6 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
         --red:     var(--nord11);
         --orange:  var(--nord12);
         --yellow:  var(--nord13);
-        --purple:  var(--nord15);
         --cyan:    var(--nord7);
       }
       * { box-sizing: border-box; border-radius: 0 !important; }
@@ -147,9 +139,9 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
         gap: 0.15rem;
       }
       .statusbar .ws {
-        padding: 0.1rem 0.5rem;
+        padding: 0.2rem 0.5rem;
         color: var(--nord4);
-        opacity: 0.55;
+        opacity: 0.75;
         text-decoration: none;
         cursor: pointer;
         line-height: 1.5;
@@ -178,13 +170,14 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       }
       .statusbar #theme-toggle:hover { border-color: var(--accent-ink); color: var(--accent-ink); }
       .statusbar #theme-toggle:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
-      .statusbar .sysinfo {
-        display: flex;
-        gap: 0.75rem;
-        color: var(--nord5);
+      .statusbar #clock {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--dim);
+        font-variant-numeric: tabular-nums;
       }
-      .statusbar .sysinfo .host { color: var(--nord5); }
-      .statusbar .sysinfo .clock { color: var(--nord5); }
 
       .terminal {
         max-width: 52rem;
@@ -232,7 +225,9 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       @media (max-width: 480px) {
         body { font-size: 13.5px; }
         .statusbar { height: auto; padding: 0.25rem 0.5rem; }
-        .statusbar .sysinfo { display: none; }
+      }
+      @media (max-width: 700px) {
+        .statusbar #clock { display: none; }
       }
     </style>
   </head>
@@ -242,7 +237,7 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
         var el = document.querySelector(".prompt .cwd");
         var label = p || "/";
         if (el) el.textContent = label;
-        document.title = "setyanoegraha";
+        document.title = label === "/" ? "setyanoegraha" : "setyanoegraha · " + label;
       };
     </script>
     <div class="statusbar">
@@ -253,10 +248,7 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
           </a>
         ))}
       </div>
-      <div class="sysinfo">
-        <span class="host">setyanoegraha</span>
-        <span class="clock" id="clock">--:--</span>
-      </div>
+      <span id="clock">--:--</span>
       <button id="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">theme</button>
     </div>
     <div class="terminal">
