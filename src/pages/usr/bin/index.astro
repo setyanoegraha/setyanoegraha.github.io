@@ -3,33 +3,21 @@ import Terminal from "../../../layouts/Terminal.astro";
 
 const GITHUB_USER = "setyanoegraha";
 
-// Curated tools only — /usr/bin is for executables you're proud of.
-// Add new tools here manually; stars are fetched automatically at build time.
-const tools = [
-  {
-    name: "hackmyvm-commandlineinterface",
-    description:
-      "A versatile Python-based CLI toolkit for HackMyVM. Search machines, download VMs from MEGA with high-speed progress bars, and submit flags directly from terminal.",
-  },
-  {
-    name: "hmv-tui",
-    description:
-      "An interactive Rust-based TUI dashboard for HackMyVM. Browse 370+ machines, stream VM downloads from MEGA with on-the-fly decryption, and submit flags & writeups — all from the terminal.",
-  },
-  {
-    name: "dl-tui",
-    description:
-      "Unofficial DockerLabs terminal dashboard in Rust + ratatui. Machine catalog, downloads, writeups, ratings, certificates and progress tracking — Nord themed, English UI.",
-  },
-  {
-    name: "nyx-tui",
-    description:
-      "Unofficial VulnyX terminal dashboard — machine catalog, downloads (CAPTCHA-assisted), first-blood flags, writeups & leaderboard. Pure Rust, English UI, Nord theme.",
-  },
+// Curated allowlist — /usr/bin is for executables you're proud of.
+// Add new repos here manually; metadata is fetched at build time.
+const REPOS = [
+  "ledger-tui",
+  "nyx-tui",
+  "hmv-tui",
+  "dl-tui",
+  "webapp_osce",
+  "hackmyvm-commandlineinterface",
 ];
 
 interface RepoInfo {
-    stargazers_count: number;
+  description: string | null;
+  language: string | null;
+  stargazers_count: number;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -61,15 +49,18 @@ async function gh<T>(url: string): Promise<T> {
 }
 
 const enriched = await Promise.all(
-  tools.map(async (t) => {
-    let stars: number | null = null;
+  REPOS.map(async (name) => {
+    let info: RepoInfo | null = null;
     try {
-      const info = await gh<RepoInfo>(
-        `https://api.github.com/repos/${GITHUB_USER}/${t.name}`
-      );
-      stars = info.stargazers_count;
+      info = await gh<RepoInfo>(`https://api.github.com/repos/${GITHUB_USER}/${name}`);
     } catch {}
-    return { ...t, url: `https://github.com/${GITHUB_USER}/${t.name}`, stars };
+    return {
+      name,
+      url: `https://github.com/${GITHUB_USER}/${name}`,
+      description: info?.description ?? null,
+      language: info?.language ?? null,
+      stars: info?.stargazers_count ?? null,
+    };
   })
 );
 ---
@@ -80,7 +71,8 @@ const enriched = await Promise.all(
       <a class="bin" href={t.url} target="_blank" rel="noopener">
         <span class="name">./{t.name}</span>
         {t.stars !== null && <span class="meta">★ {t.stars}</span>}
-        <p>{t.description}</p>
+        {t.language && <span class="meta">{t.language}</span>}
+        {t.description && <p>{t.description}</p>}
       </a>
     ))}
   </div>
