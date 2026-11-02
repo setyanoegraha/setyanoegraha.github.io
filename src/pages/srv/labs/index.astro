@@ -45,6 +45,15 @@ const HACKMYVM_DIFFICULTY: Record<string, string> = {
 };
 const hmvDifficulty = (name: string) => HACKMYVM_DIFFICULTY[name.toLowerCase()] ?? null;
 
+// Spoiler gate only: the writeup repos are public, so this delays the click, it does not hide content.
+const WRITEUPS: Record<string, string> = {
+  ledger: "/var/log#hackmyvm-writeups/machines/ledger",
+  grenade: "/var/log#hackmyvm-writeups/machines/grenade",
+  groups: "/var/log#vulnyx-writeups/groups",
+  hannah_coffee: "/var/log#dockerlabs-writeups/hannah_coffee",
+};
+const writeupFor = (name: string) => WRITEUPS[name.toLowerCase()] ?? null;
+
 async function fetchWithRetry(url: string): Promise<Response | null> {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
@@ -223,6 +232,20 @@ const machineUrl = (platform: string, name: string) =>
                 )}
                 {m.note && <span class="note">{m.note}</span>}
                 {m.description && <p class="desc">{m.description}</p>}
+                {
+                  writeupFor(m.name) ? (
+                    <details class="wu">
+                      <summary>writeup — spoiler, try the box first</summary>
+                      <p>
+                        <a href={writeupFor(m.name)!} target="_blank" rel="noopener">
+                          read the full walkthrough →
+                        </a>
+                      </p>
+                    </details>
+                  ) : (
+                    <p class="wu-none">writeup: coming soon</p>
+                  )
+                }
               </li>
             ))}
           </ul>
@@ -265,5 +288,25 @@ const machineUrl = (platform: string, name: string) =>
       line-height: 1.55;
     }
     .lab .hint { font-size: 0.78rem; margin: 0.4rem 0 0; }
+    .lab li .wu { flex-basis: 100%; font-size: 0.78rem; margin: 0.15rem 0 0; }
+    .lab li .wu > summary {
+      list-style: none;
+      cursor: pointer;
+      color: var(--orange);
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border: 1px solid var(--border);
+    }
+    .lab li .wu > summary::-webkit-details-marker { display: none; }
+    .lab li .wu > summary::before { content: "▸ "; color: var(--dim); }
+    .lab li .wu[open] > summary::before { content: "▾ "; }
+    .lab li .wu > summary:hover { border-color: var(--orange); }
+    .lab li .wu p { margin: 0.35rem 0 0; }
+    .lab li .wu-none {
+      flex-basis: 100%;
+      margin: 0.15rem 0 0;
+      color: var(--dim);
+      font-size: 0.78rem;
+    }
   </style>
 </Terminal>
