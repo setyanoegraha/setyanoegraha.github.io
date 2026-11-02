@@ -110,12 +110,13 @@ const zipManifest = repos.map((r) => ({
       <p class="back"><a href="#" id="back-link">&lt; cd ../</a> <span id="viewer-path"></span></p>
       <div id="viewer-body">
         <article id="article"></article>
-        <aside id="toc-pane" hidden>
-          <p class="toc-title">cat /toc</p>
+        <details id="toc-pane" open hidden>
+          <summary class="toc-title">cat /toc</summary>
           <nav id="toc-list"></nav>
-        </aside>
+        </details>
       </div>
     </div>
+    <button id="to-top" type="button" title="back to top" hidden>↑ to-top</button>
     <div id="logs">
       {error ? (
         <p class="err">error indexing at build time ({error}) — check your connection and run npm run deploy again.</p>
@@ -211,6 +212,14 @@ const zipManifest = repos.map((r) => ({
     #varlog-root #search-input::placeholder { color: var(--dim); }
     #varlog-root #search-input:focus { border-bottom-color: var(--accent); }
     #varlog-root #match-count { color: var(--dim); font-size: 0.8rem; white-space: nowrap; }
+    @media (max-width: 560px) {
+      #varlog-root #search { display: block; }
+      #varlog-root #search.cmdline::before { display: none; }
+      #varlog-root #search .find-cmd { display: block; }
+      #varlog-root #search .quote { display: none; }
+      #varlog-root #search-input { display: block; width: 100%; max-width: none; min-width: 0; margin-top: 0.15rem; }
+      #varlog-root #match-count { display: block; }
+    }
     #varlog-root mark {
       background: rgba(94, 129, 172, 0.25);
       color: var(--nord8);
@@ -304,6 +313,10 @@ const zipManifest = repos.map((r) => ({
       margin: 0 0 0.5rem;
       font-size: 0.72rem;
     }
+    #varlog-root #toc-pane > summary { list-style: none; cursor: pointer; }
+    #varlog-root #toc-pane > summary::-webkit-details-marker { display: none; }
+    #varlog-root #toc-pane > summary::before { content: "▸ "; color: var(--dim); }
+    #varlog-root #toc-pane[open] > summary::before { content: "▾ "; }
     #varlog-root #toc-pane #toc-list { display: flex; flex-direction: column; gap: 0.2rem; }
     #varlog-root #toc-pane a {
       color: var(--nord4);
@@ -318,8 +331,18 @@ const zipManifest = repos.map((r) => ({
       scroll-margin-top: 2.5rem;
     }
     @media (max-width: 1240px) {
+      #varlog-root #viewer-body { display: flex; flex-direction: column; }
       #varlog-root #toc-pane {
-        display: none !important;
+        position: static;
+        order: -1;
+        width: auto;
+        left: auto;
+        max-height: none;
+        overflow-y: visible;
+        border-left: none;
+        border-bottom: 1px solid var(--border);
+        padding: 0 0 0.75rem;
+        margin-bottom: 1.25rem;
       }
     }
     #varlog-root .export-zip {
@@ -334,6 +357,22 @@ const zipManifest = repos.map((r) => ({
     }
     #varlog-root .export-zip:hover { border-color: var(--green); color: var(--green); }
     #varlog-root .export-zip:disabled { opacity: 0.5; cursor: wait; }
+    #varlog-root #to-top {
+      position: fixed;
+      right: 1rem;
+      bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+      z-index: 60;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0.4rem 0.6rem;
+      background: var(--nord0);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    #varlog-root #to-top:hover { border-color: var(--green); color: var(--green); }
   </style>
 
   <script>
@@ -351,6 +390,7 @@ const zipManifest = repos.map((r) => ({
     const viewerPath = document.getElementById("viewer-path")!;
     const tocPane = document.getElementById("toc-pane")!;
     const backLink = document.getElementById("back-link")!;
+    const toTopBtn = document.getElementById("to-top") as HTMLButtonElement;
 
     const GITHUB_USER = "setyanoegraha";
 
@@ -373,6 +413,7 @@ const zipManifest = repos.map((r) => ({
       logsEl.hidden = true;
       window.updateCwd?.(fullPath);
       window.scrollTo({ top: 0 });
+      syncToTop();
 
       let md: string | null = null;
       for (const file of [`${m.dir}.md`, `${m.dir.toLowerCase()}.md`, "README.md"]) {
@@ -528,7 +569,16 @@ const zipManifest = repos.map((r) => ({
       tocPane.hidden = true;
       history.replaceState(null, "", location.pathname + location.search);
       window.updateCwd?.("/var/log");
+      syncToTop();
     }
+
+    function syncToTop() {
+      toTopBtn.hidden = viewerEl.hidden || window.scrollY < 400;
+    }
+    window.addEventListener("scroll", syncToTop, { passive: true });
+    toTopBtn.addEventListener("click", () =>
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    );
 
     backLink.addEventListener("click", (e) => {
       e.preventDefault();

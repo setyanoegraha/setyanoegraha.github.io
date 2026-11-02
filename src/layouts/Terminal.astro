@@ -9,6 +9,7 @@ const workspaces = [
   { num: 2, label: "proc", href: "/proc", cmd: "cd /proc" },
   { num: 3, label: "bin", href: "/usr/bin", cmd: "cd /usr/bin" },
   { num: 4, label: "log", href: "/var/log", cmd: "cd /var/log" },
+  { num: 5, label: "labs", href: "/srv/labs", cmd: "cd /srv/labs" },
 ];
 const current = Astro.url.pathname.replace(/\/$/, "") || "/";
 ---
@@ -165,7 +166,7 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       @media (max-width: 480px) {
         body { font-size: 13.5px; }
         .statusbar { height: auto; padding: 0.25rem 0.5rem; }
-        .statusbar .sysinfo .clock { display: none; }
+        .statusbar .sysinfo { display: none; }
       }
     </style>
   </head>

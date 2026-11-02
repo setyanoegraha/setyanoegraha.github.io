@@ -67,7 +67,8 @@ const processes = [
     .body em { color: var(--dim); font-style: normal; font-size: 0.82rem; }
     @media (max-width: 560px) {
       .head { display: none; }
-      .row { grid-template-columns: 1fr; gap: 0; padding-left: 0.75rem; border-left: 2px solid var(--border); }
+      .row { grid-template-columns: auto auto auto 1fr; gap: 0.5rem; }
+      .row .body { grid-column: 1 / -1; }
     }
   </style>
 </Terminal>
