@@ -199,7 +199,7 @@ const machineUrl = (platform: string, name: string) =>
 <Terminal title="setyanoegraha" path="/srv/labs">
   <h1 class="cmdline">ls -R /srv/labs</h1>
   <p class="dim">
-    vulnerable machines I built as <span class="who">{CREATOR}</span>, published on three
+    vulnerable machines I built as <span class="who">{CREATOR}</span> — published on three
     platforms.
   </p>
   {
@@ -208,11 +208,11 @@ const machineUrl = (platform: string, name: string) =>
         <h2>
           {g.platform}{" "}
           <span class="count">
-            ({g.machines.length === 1 ? "1 machine" : `${g.machines.length} machines`})
+            — {g.machines.length === 1 ? "1 machine" : `${g.machines.length} machines`}
           </span>
         </h2>
         {g.machines.length === 0 ? (
-          <p class="dim">no machines indexed: build-time fetch returned nothing</p>
+          <p class="dim">no machines indexed — build-time fetch returned nothing</p>
         ) : (
           <ul>
             {g.machines.map((m) => (
@@ -235,7 +235,7 @@ const machineUrl = (platform: string, name: string) =>
                 {
                   writeupFor(m.name) ? (
                     <details class="wu">
-                      <summary>writeup: spoiler, try the box first</summary>
+                      <summary>writeup — spoiler, try the box first</summary>
                       <p>
                         <a href={writeupFor(m.name)!} target="_blank" rel="noopener">
                           read the full walkthrough →

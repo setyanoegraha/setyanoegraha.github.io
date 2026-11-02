@@ -18,18 +18,18 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="setyanoegraha: security writeups, tools and projects." />
+    <meta name="description" content="setyanoegraha — security writeups, tools and projects." />
     <link rel="icon" href="https://github.com/setyanoegraha.png" />
     <meta name="referrer" content="no-referrer" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="setyanoegraha" />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content="security writeups, tools and projects, presented as a terminal" />
+    <meta property="og:description" content="security writeups, tools and projects — presented as a terminal" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:image" content="https://github.com/setyanoegraha.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content="security writeups, tools and projects, presented as a terminal" />
+    <meta name="twitter:description" content="security writeups, tools and projects — presented as a terminal" />
     <meta name="twitter:image" content="https://github.com/setyanoegraha.png" />
     <link rel="canonical" href={Astro.url} />
     <title>{title}</title>
@@ -43,53 +43,78 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       })();
     </script>
     <style is:global>
-      /* Reading this as: personal security portfolio for recruiters and peers,
-         in a documented-terminal language, dial ENERGY 1 / RHYTHM 2 / MOTION 1.
-         ENERGY 1: the audience reads long writeups, not a sales page.
-         RHYTHM 2: the five workspaces already differ; only var/log varies further.
-         MOTION 1: hover states and smooth scroll are the whole motion budget. */
       :root {
         color-scheme: light;
-        --bg:        #fbfaf7;
-        --bg-alt:    #f2efe9;
-        --fg:        #23272e;
-        --dim:       #5b6270;
-        --border:    #d9d3c8;
-        --green:     #2f6b3f;
-        --blue:      #1f5f8b;
-        --blue2:     #2f6b3f;
-        --accent:    #1f5f8b;
-        --red:       #a83232;
-        --orange:    #8a5a12;
-        --yellow:    #8a5a12;
-        --purple:    #6b3fa0;
-        --cyan:      #1c6b74;
-        --font-sans: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-        --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
-        --nord0: var(--bg);
-        --nord1: var(--bg-alt);
-        --nord4: var(--fg);
-        --nord5: var(--fg);
-        --nord6: var(--fg);
-        --nord8: var(--blue);
+        --nord0:  #eceff4;
+        --nord1:  #e5e9f0;
+        --nord2:  #d8dee9;
+        --nord3:  #4c566a;
+        --nord4:  #2e3440;
+        --nord5:  #2e3440;
+        --nord6:  #eceff4;
+        --nord7:  #2f6b70;
+        --nord8:  #3a6b94;
+        --nord9:  #44698f;
+        --nord10: #3a6b94;
+        --nord11: #a03b45;
+        --nord12: #8a5127;
+        --nord13: #7a5a1e;
+        --nord14: #3f6b34;
+        --nord15: #6f4a86;
+
+        --bg:      var(--nord0);
+        --bg-alt:  var(--nord1);
+        --fg:      var(--nord4);
+        --dim:     var(--nord3);
+        --border:  var(--nord2);
+        --green:   var(--nord14);
+        --blue:    var(--nord8);
+        --blue2:   var(--nord9);
+        --accent:  #3a6b94;
+        --accent-ink: #2f5f88;
+        --chip-fg: #ffffff;
+        --red:     var(--nord11);
+        --orange:  var(--nord12);
+        --yellow:  var(--nord13);
+        --purple:  var(--nord15);
+        --cyan:    var(--nord7);
       }
 
       :root[data-theme="dark"] {
         color-scheme: dark;
-        --bg:       #2e3440;
-        --bg-alt:   #3b4252;
-        --fg:       #e5e9f0;
-        --dim:      #b3bac9;
-        --border:   #4c566a;
-        --green:    #a3d9a5;
-        --blue:     #8fb8d8;
-        --blue2:    #8fb8d8;
-        --accent:   #8fb8d8;
-        --red:      #e89aa0;
-        --orange:   #e0a07a;
-        --yellow:   #ebcb8b;
-        --purple:   #c9a9d4;
-        --cyan:     #8fbcbb;
+        --nord0:  #2e3440;
+        --nord1:  #3b4252;
+        --nord2:  #434c5e;
+        --nord3:  #a8b0c0;
+        --nord4:  #d8dee9;
+        --nord5:  #e5e9f0;
+        --nord6:  #eceff4;
+        --nord7:  #8fbcbb;
+        --nord8:  #88c0d0;
+        --nord9:  #9db4cd;
+        --nord10: #4a6484;
+        --nord11: #e2a2a8;
+        --nord12: #dda483;
+        --nord13: #ebcb8b;
+        --nord14: #a3be8c;
+        --nord15: #c4a6cf;
+
+        --bg:      var(--nord0);
+        --bg-alt:  var(--nord1);
+        --fg:      var(--nord4);
+        --dim:     var(--nord3);
+        --border:  var(--nord2);
+        --green:   var(--nord14);
+        --blue:    var(--nord8);
+        --blue2:   var(--nord9);
+        --accent:  #4a6484;
+        --accent-ink: #88c0d0;
+        --chip-fg: #eceff4;
+        --red:     var(--nord11);
+        --orange:  var(--nord12);
+        --yellow:  var(--nord13);
+        --purple:  var(--nord15);
+        --cyan:    var(--nord7);
       }
       * { box-sizing: border-box; border-radius: 0 !important; }
       html { scroll-behavior: smooth; }
@@ -97,21 +122,10 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
         margin: 0;
         background: var(--bg);
         color: var(--fg);
-        font-family: var(--font-sans);
-        font-size: 16px;
-        line-height: 1.7;
+        font-family: ui-monospace, "JetBrains Mono", "Fira Code", "Cascadia Code", Menlo, Consolas, monospace;
+        font-size: 15px;
+        line-height: 1.75;
         -webkit-font-smoothing: antialiased;
-      }
-
-      .prompt, .cmdline, code, pre, kbd, .statusbar, .bin .name, .lab li a, #search-input {
-        font-family: var(--font-mono);
-      }
-
-      h1.cmdline, h2.cmdline { letter-spacing: 0; }
-
-      :where(a, button, summary, input, [tabindex]):focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
       }
 
       .statusbar {
@@ -147,10 +161,23 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       }
       .statusbar .ws[aria-current="page"] {
         background: var(--accent);
-        color: var(--nord6);
+        color: var(--chip-fg);
         font-weight: 600;
         opacity: 1;
       }
+      .statusbar #theme-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--fg);
+        font-family: inherit;
+        font-size: 0.75rem;
+        padding: 0.1rem 0.5rem;
+        cursor: pointer;
+        min-height: 24px;
+        margin-left: 0.75rem;
+      }
+      .statusbar #theme-toggle:hover { border-color: var(--accent-ink); color: var(--accent-ink); }
+      .statusbar #theme-toggle:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
       .statusbar .sysinfo {
         display: flex;
         gap: 0.75rem;
@@ -158,18 +185,6 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       }
       .statusbar .sysinfo .host { color: var(--nord5); }
       .statusbar .sysinfo .clock { color: var(--nord5); }
-      .statusbar #theme-toggle {
-        background: none;
-        border: 1px solid var(--border);
-        color: var(--fg);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        padding: 0.1rem 0.5rem;
-        cursor: pointer;
-        min-height: 24px;
-        margin-left: 0.75rem;
-      }
-      .statusbar #theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
       .terminal {
         max-width: 52rem;
@@ -180,7 +195,11 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       }
       a { color: var(--blue); text-decoration: none; }
       a:hover { text-decoration: underline; text-underline-offset: 3px; }
-      ::selection { background: var(--accent); color: var(--nord6); }
+      :where(a, button, summary, input, [tabindex]):focus-visible {
+        outline: 2px solid var(--accent-ink);
+        outline-offset: 2px;
+      }
+      ::selection { background: var(--accent); color: var(--chip-fg); }
 
       .prompt {
         color: var(--dim);
@@ -198,8 +217,8 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
 
       .cmdline { margin: 1.5rem 0 0.75rem; }
       .cmdline::before { content: "$ "; color: var(--green); }
-      h1.cmdline { font-size: 1.15rem; font-weight: 600; }
-      h2.cmdline { font-size: 1.05rem; font-weight: 600; }
+      h1.cmdline { font-size: 1.05rem; font-weight: 600; }
+      h2.cmdline { font-size: 1rem; font-weight: 600; }
 
       footer {
         padding: 1.5rem 1.25rem 2.5rem;

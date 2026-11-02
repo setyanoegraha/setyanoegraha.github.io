@@ -119,7 +119,7 @@ const zipManifest = repos.map((r) => ({
     <button id="to-top" type="button" title="back to top" hidden>↑ to-top</button>
     <div id="logs">
       {error ? (
-        <p class="err">error indexing at build time ({error}). Check your connection and run npm run deploy again.</p>
+        <p class="err">error indexing at build time ({error}) — check your connection and run npm run deploy again.</p>
       ) : (
         <div id="index">
           <div id="search" class="cmdline">
@@ -133,7 +133,7 @@ const zipManifest = repos.map((r) => ({
             <div class="repo">
               <h2>
                 {repo.name}.log <span class="count">
-                  ({repo.machines.length === 1 ? "1 entry" : `${repo.machines.length} machines`})
+                  — {repo.machines.length === 1 ? "1 entry" : `${repo.machines.length} machines`}
                 </span>
               </h2>
               <button class="export-zip" data-repo={repo.name}>wget -r {repo.name}</button>
@@ -206,11 +206,11 @@ const zipManifest = repos.map((r) => ({
       flex: 1;
       max-width: 20rem;
       min-width: 8rem;
-      outline: 2px solid transparent;
+      outline: none;
       caret-color: var(--green);
     }
     #varlog-root #search-input::placeholder { color: var(--dim); }
-    #varlog-root #search-input:focus { border-bottom-color: var(--accent); }
+    #varlog-root #search-input:focus { border-bottom-color: var(--accent-ink); }
     #varlog-root #match-count { color: var(--dim); font-size: 0.8rem; white-space: nowrap; }
     @media (max-width: 560px) {
       #varlog-root #search { display: block; }
@@ -226,9 +226,7 @@ const zipManifest = repos.map((r) => ({
       padding: 0 1px;
     }
 
-    #varlog-root #article { line-height: 1.75; font-size: 1rem; max-width: 68ch; }
-    #varlog-root #article table { display: block; overflow-x: auto; }
-    #varlog-root #article img { max-width: 100%; height: auto; }
+    #varlog-root #article { line-height: 1.7; font-size: 0.9rem; }
     #varlog-root #article h1, #varlog-root #article h2 { color: var(--green); border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
     #varlog-root #article h3, #varlog-root #article h4 { color: var(--blue); }
     #varlog-root #article code {
@@ -332,7 +330,7 @@ const zipManifest = repos.map((r) => ({
     #varlog-root #article h1, #varlog-root #article h2, #varlog-root #article h3 {
       scroll-margin-top: 2.5rem;
     }
-    @media (max-width: 1349px) {
+    @media (max-width: 1240px) {
       #varlog-root #viewer-body { display: flex; flex-direction: column; }
       #varlog-root #toc-pane {
         position: static;
@@ -430,7 +428,7 @@ const zipManifest = repos.map((r) => ({
 
       if (md === null) {
         articleEl.innerHTML =
-          `<p class="err">cat: ${m.dir}.md: failed to fetch. ` +
+          `<p class="err">cat: ${m.dir}.md: failed to fetch — ` +
           `<a href="https://github.com/${GITHUB_USER}/${m.repo}/tree/${m.branch}/${m.prefix}${m.dir}" target="_blank" rel="noopener">open on github</a></p>`;
         return;
       }
@@ -696,8 +694,8 @@ const zipManifest = repos.map((r) => ({
         const countSpan = block.querySelector(".count");
         if (countSpan) {
           countSpan.textContent = q
-            ? `(${visible} / ${links.length} hits)`
-            : `(${links.length === 1 ? "1 entry" : `${links.length} machines`})`;
+            ? `— ${visible} / ${links.length} hits`
+            : `— ${links.length === 1 ? "1 entry" : `${links.length} machines`}`;
         }
         block.style.display = q && visible === 0 ? "none" : "";
       });
