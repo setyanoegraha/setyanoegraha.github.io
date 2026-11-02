@@ -1,5 +1,6 @@
 ---
 import Terminal from "../../../layouts/Terminal.astro";
+import vulnyxFallback from "../../../data/vulnyx-fallback.json";
 
 const CREATOR = "noneofyour";
 const UA =
@@ -143,7 +144,11 @@ interface VulnyxMachine {
 const vulnyxIndex = await getJson<VulnyxMachine[]>(
   "https://vulnyx.com/data/machines-index.json"
 );
-const vulnyx: LabMachine[] = (vulnyxIndex ?? [])
+// Cloudflare answers CI datacenter IPs with a challenge page, so keep a snapshot
+// of the owned machines; shortcut: static list, refresh when a machine is added.
+const vulnyxSource: VulnyxMachine[] =
+  vulnyxIndex ?? (vulnyxFallback as VulnyxMachine[]);
+const vulnyx: LabMachine[] = vulnyxSource
   .filter((m) => (m.creator ?? "").toLowerCase() === CREATOR)
   .map((m) => ({
     name: m.name,
