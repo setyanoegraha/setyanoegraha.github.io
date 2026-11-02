@@ -1,0 +1,246 @@
+---
+import Terminal from "../../../layouts/Terminal.astro";
+
+const CREATOR = "noneofyour";
+const UA =
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36";
+
+interface LabMachine {
+  name: string;
+  difficulty: string | null;
+  note: string | null;
+  description: string | null;
+  download: string | null;
+}
+
+const DESCRIPTIONS: Record<string, string> = {
+  hannah_coffee:
+    "Linux web app with a chained PHP LFI and FTP log poisoning path to RCE as www-data, then sudo plus file capabilities up to root.",
+  ledger:
+    "Werkzeug 'SimpleLedger' accounting app whose CSV upload trusts the multipart filename, giving RCE; base64 creds in SL_META pivot to the finance user over SSH before a SUID binary finishes the path to root.",
+  grenade:
+    "AlmaLinux WordPress 6.6.2 with GiveWP 4.16.5.1, exploited through CVE-2026-82222 unauthenticated PHP object injection to RCE, then a backup credential file for the pivot.",
+  groups:
+    "Log-ingest console that compiles an attacker-supplied regex, so a catastrophic pattern starves the GIL; a fail-open watchdog then exposes a root netcat listener.",
+};
+const describe = (name: string) => DESCRIPTIONS[name.toLowerCase()] ?? null;
+
+const DIFFICULTY_EN: Record<string, string> = {
+  "muy facil": "Very Easy",
+  "muy fácil": "Very Easy",
+  facil: "Easy",
+  fácil: "Easy",
+  medio: "Medium",
+  difícil: "Hard",
+  dificil: "Hard",
+};
+const difficultyEn = (raw: string | null) =>
+  raw ? (DIFFICULTY_EN[raw.trim().toLowerCase()] ?? raw.trim()) : null;
+
+// HackMyVM hides difficulty behind login; values come from the owner's own writeups.
+const HACKMYVM_DIFFICULTY: Record<string, string> = {
+  ledger: "easy",
+  grenade: "easy",
+};
+const hmvDifficulty = (name: string) => HACKMYVM_DIFFICULTY[name.toLowerCase()] ?? null;
+
+async function getJson<T>(url: string): Promise<T | null> {
+  try {
+    const r = await fetch(url, { headers: { "User-Agent": UA } });
+    return r.ok ? ((await r.json()) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function getText(url: string): Promise<string | null> {
+  try {
+    const r = await fetch(url, { headers: { "User-Agent": UA } });
+    return r.ok ? await r.text() : null;
+  } catch {
+    return null;
+  }
+}
+
+interface DockerLabsProfile {
+  maquinas: { nombre: string; dificultad: string; imagen_url: string }[];
+}
+const dockerlabsProfile = await getJson<DockerLabsProfile>(
+  `https://dockerlabs.es/api/author_profile?nombre=${CREATOR}`
+);
+const dockerlabs: LabMachine[] = await Promise.all(
+  (dockerlabsProfile?.maquinas ?? []).map(async (m) => {
+    const id = /(\d+)\s*$/.exec(m.imagen_url ?? "")?.[1];
+    let download: string | null = null;
+    if (id) {
+      const page = await getText(`https://dockerlabs.es/maquinas/${id}/descargar`);
+      download = /<a class="descargar-btn" href="([^"]+)"/.exec(page ?? "")?.[1] ?? null;
+    }
+    return {
+      name: m.nombre,
+      difficulty: difficultyEn(m.dificultad),
+      note: null,
+      description: describe(m.nombre),
+      download,
+    };
+  })
+);
+
+const anon = await getText("https://hackmyvm.eu/anonymous");
+const hmvDownloads = new Map<string, string>();
+for (const art of (anon ?? "").matchAll(
+  /<article[^>]*class="[^"]*\bmachine\b[^"]*"[\s\S]*?<\/article>/g
+)) {
+  const block = art[0];
+  const name = /class="[^"]*font-medium[^"]*"[^>]*>\s*([^<]+?)\s*</.exec(block)?.[1];
+  const href = /href="(https:\/\/downloads\.hackmyvm\.eu\/[^"]+)"/.exec(block)?.[1];
+  if (name && href) hmvDownloads.set(name.trim().toLowerCase(), href);
+}
+
+const rss = await getText("https://hackmyvm.eu/static/rss.xml");
+const hackmyvm: LabMachine[] = [...(rss ?? "").matchAll(/<item>([\s\S]*?)<\/item>/g)]
+  .map(([, body]) => ({
+    name: (/<title>([^<]*)<\/title>/.exec(body)?.[1] ?? "").trim(),
+    creator: (/<creator>([^<]*)<\/creator>/.exec(body)?.[1] ?? "").trim(),
+  }))
+  .filter((m) => m.creator.toLowerCase() === CREATOR)
+  .map((m) => ({
+    name: m.name,
+    difficulty: hmvDifficulty(m.name),
+    note: null,
+    description: describe(m.name),
+    download:
+      hmvDownloads.get(m.name.toLowerCase()) ??
+      `https://downloads.hackmyvm.eu/${m.name.toLowerCase()}.zip`,
+  }));
+
+interface VulnyxMachine {
+  name: string;
+  creator: string;
+  os: string | null;
+  difficulty: string | null;
+  release_date: string | null;
+  download_url: string | null;
+}
+const vulnyxIndex = await getJson<VulnyxMachine[]>(
+  "https://vulnyx.com/data/machines-index.json"
+);
+const vulnyx: LabMachine[] = (vulnyxIndex ?? [])
+  .filter((m) => (m.creator ?? "").toLowerCase() === CREATOR)
+  .map((m) => ({
+    name: m.name,
+    difficulty: m.difficulty,
+    note: [m.os, m.release_date].filter(Boolean).join(" · ") || null,
+    description: describe(m.name),
+    download:
+      m.download_url ?? `https://vulnyx.com/download.php?vm=${encodeURIComponent(m.name)}`,
+  }));
+
+const sortByName = (list: LabMachine[]) =>
+  [...list].sort((a, b) => a.name.localeCompare(b.name));
+
+const groups = [
+  {
+    platform: "DockerLabs",
+    hint: null as string | null,
+    machines: sortByName(dockerlabs),
+  },
+  {
+    platform: "HackMyVM",
+    hint: null as string | null,
+    machines: sortByName(hackmyvm),
+  },
+  {
+    platform: "VulNyx",
+    hint: "downloads are gated by a one-time image CAPTCHA (max 2 VMs/min)",
+    machines: sortByName(vulnyx),
+  },
+];
+
+const machineUrl = (platform: string, name: string) =>
+  platform === "HackMyVM"
+    ? `https://hackmyvm.eu/machines/machine.php?vm=${encodeURIComponent(name)}`
+    : platform === "DockerLabs"
+      ? "https://dockerlabs.es/perfil/noneofyour"
+      : "https://vulnyx.com/machines/";
+---
+<Terminal title="setyanoegraha" path="/srv/labs">
+  <h1 class="cmdline">ls -R /srv/labs</h1>
+  <p class="dim">
+    vulnerable machines I built as <span class="who">{CREATOR}</span> — published on three
+    platforms.
+  </p>
+  {
+    groups.map((g) => (
+      <section class="lab">
+        <h2>
+          {g.platform}{" "}
+          <span class="count">
+            — {g.machines.length === 1 ? "1 machine" : `${g.machines.length} machines`}
+          </span>
+        </h2>
+        {g.machines.length === 0 ? (
+          <p class="dim">no machines indexed — build-time fetch returned nothing</p>
+        ) : (
+          <ul>
+            {g.machines.map((m) => (
+              <li>
+                <a
+                  href={m.download ?? machineUrl(g.platform, m.name)}
+                  target="_blank"
+                  rel="noopener"
+                  title="download"
+                >
+                  {m.name}
+                </a>
+                {m.difficulty && (
+                  <span class="badge">
+                    {m.difficulty[0].toUpperCase() + m.difficulty.slice(1)}
+                  </span>
+                )}
+                {m.note && <span class="note">{m.note}</span>}
+                {m.description && <p class="desc">{m.description}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+        {g.hint && <p class="dim hint"># {g.hint}</p>}
+      </section>
+    ))
+  }
+
+  <style>
+    .dim { color: var(--dim); }
+    .who { color: var(--green); }
+    .lab { margin-bottom: 2rem; }
+    .lab h2 {
+      font-size: 0.95rem;
+      color: var(--yellow);
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+    }
+    .lab h2 .count { color: var(--dim); font-weight: 400; }
+    .lab ul { list-style: none; padding: 0; margin: 0; }
+    .lab li {
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      row-gap: 0.25rem;
+      align-items: baseline;
+    }
+    .lab li a::before { content: "./"; color: var(--dim); }
+    .lab li a::after { content: " ↓"; color: var(--dim); font-size: 0.75rem; }
+    .lab .badge { color: var(--orange); font-size: 0.78rem; }
+    .lab .note { color: var(--dim); font-size: 0.78rem; }
+    .lab li .desc {
+      flex-basis: 100%;
+      margin: 0;
+      color: var(--dim);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .lab .hint { font-size: 0.78rem; margin: 0.4rem 0 0; }
+  </style>
+</Terminal>
