@@ -1,26 +1,56 @@
 ---
-import Terminal from "../layouts/Terminal.astro";
+import Base from "../layouts/Base.astro";
+import { profile } from "../data/profile";
+
+const HIGHLIGHTS = [
+  "ledger-tui",
+  "revshell-tui",
+  "webapp_osce",
+  "hackmyvm-commandlineinterface",
+];
+const highlights = profile.projects.filter((p) => HIGHLIGHTS.includes(p.name));
 ---
-<Terminal path="/">
-  <h1 class="cmdline">whoami</h1>
+<Base>
+  <h2>Introduction</h2>
   <p>
-    I'm <strong>Nugraha</strong>, a 5th-semester Computer Engineering Technology
-    student at POLINES. Most of my free time goes into vulnerable-machine labs,
-    with 260+ boxes rooted across HackMyVM, DockerLabs and VulNyx. When the
-    workflow gets repetitive, I script it away in Python.
-    Currently looking for an IT/security internship.
+    I'm <strong>{profile.name}</strong>, a {profile.tagline} Most of my time
+    goes into hands-on security labs — 260+ completed across public platforms.
   </p>
 
-  <h2 class="cmdline">cat contact.txt</h2>
+  <h2>Status</h2>
   <ul>
-    <li><span style="color: var(--dim)">github</span> → <a href="https://github.com/setyanoegraha">setyanoegraha</a></li>
-    <li><span style="color: var(--dim)">linkedin</span> → <a href="https://www.linkedin.com/in/setyanoegraha/">in/setyanoegraha</a></li>
-    <li><span style="color: var(--dim)">writeups</span> → see <a href="/var/log">/var/log</a></li>
-    <li><span style="color: var(--dim)">tools</span> → see <a href="/usr/bin">/usr/bin</a></li>
+    {profile.status.map((s) => <li>{s}</li>)}
   </ul>
 
-  <h2 class="cmdline">uptime</h2>
-  <p style="color: var(--dim)">
-    seeking internship · grinding labs · building lab machines · writing everything down
+  <h2>Projects</h2>
+  <ul>
+    {highlights.map((p) => (
+      <li>
+        <a href={p.url} target="_blank" rel="noopener">{p.name}</a>
+      </li>
+    ))}
+  </ul>
+  <p><a href="/projects">see all projects →</a></p>
+
+  <h2>Achievements</h2>
+  <ul>
+    {profile.achievements.map((a) => (
+      <li>
+        {a.url ? <a href={a.url}>{a.title}</a> : <strong>{a.title}</strong>}
+        {" — "}{a.detail}
+      </li>
+    ))}
+  </ul>
+
+  <h2>Blog</h2>
+  <p>
+    Full walkthroughs of every lab I complete — <a href="/blog">read the blog →</a>
   </p>
-</Terminal>
+
+  <h2>Contact</h2>
+  <ul>
+    <li><a href={profile.links.github} target="_blank" rel="noopener">github</a></li>
+    <li><a href={profile.links.linkedin} target="_blank" rel="noopener">linkedin</a></li>
+    <li><a href={`mailto:${profile.links.email}`}>email</a></li>
+  </ul>
+</Base>

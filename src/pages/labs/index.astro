@@ -1,0 +1,47 @@
+---
+import Base from "../../layouts/Base.astro";
+
+const platforms = [
+  {
+    name: "DockerLabs",
+    url: "https://dockerlabs.es/perfil/noneofyour",
+    note: "profile page lists every machine I authored",
+  },
+  {
+    name: "HackMyVM",
+    url: "https://hackmyvm.eu",
+    note: "machines published under the username noneofyour",
+  },
+  {
+    name: "VulNyx",
+    url: "https://vulnyx.com/machines/",
+    note: "machine index on the platform site",
+  },
+];
+---
+<Base>
+  <h1>Lab machines</h1>
+  <p>
+    Vulnerable machines I authored, published on public practice platforms. Each
+    one ships with a full walkthrough — <a href="/blog">read the writeups →</a>
+  </p>
+  {platforms.map((p) => (
+    <section class="platform">
+      <h2>{p.name}</h2>
+      <p>
+        {p.note} — <a href={p.url} target="_blank" rel="noopener">{p.url}</a>
+      </p>
+    </section>
+  ))}
+
+  <style>
+    .platform { margin-bottom: 1.5rem; }
+    .platform h2 {
+      font-size: 0.95rem;
+      color: var(--yellow);
+      font-weight: 600;
+      margin: 0 0 0.35rem;
+    }
+    .platform p { margin: 0; font-size: 0.85rem; color: var(--dim); }
+  </style>
+</Base>

@@ -1,35 +1,30 @@
 ---
-interface Props {
-  path?: string;
-}
-const { path = "/" } = Astro.props;
-const fullTitle = path === "/" ? "setyanoegraha" : `setyanoegraha · ${path}`;
 const workspaces = [
-  { num: 1, label: "home", href: "/", cmd: "cd /" },
-  { num: 2, label: "proc", href: "/proc", cmd: "cd /proc" },
-  { num: 3, label: "bin", href: "/usr/bin", cmd: "cd /usr/bin" },
-  { num: 4, label: "log", href: "/var/log", cmd: "cd /var/log" },
-  { num: 5, label: "labs", href: "/srv/labs", cmd: "cd /srv/labs" },
+  { label: "home", href: "/" },
+  { label: "projects", href: "/projects" },
+  { label: "labs", href: "/labs" },
+  { label: "blog", href: "/blog" },
 ];
 const current = Astro.url.pathname.replace(/\/$/, "") || "/";
+const fullTitle = "setyanoegraha";
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="setyanoegraha — security writeups, tools and projects." />
+    <meta name="description" content="Nugraha — computer engineering student building and breaking things in IT security. Projects, labs, writeups." />
     <link rel="icon" href="https://github.com/setyanoegraha.png" />
     <meta name="referrer" content="no-referrer" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="setyanoegraha" />
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content="security writeups, tools and projects — presented as a terminal" />
+    <meta property="og:description" content="Nugraha — computer engineering student building and breaking things in IT security. Projects, labs, writeups." />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:image" content="https://github.com/setyanoegraha.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content="security writeups, tools and projects — presented as a terminal" />
+    <meta name="twitter:description" content="Nugraha — computer engineering student building and breaking things in IT security. Projects, labs, writeups." />
     <meta name="twitter:image" content="https://github.com/setyanoegraha.png" />
     <link rel="canonical" href={Astro.url} />
     <title>{fullTitle}</title>
@@ -194,24 +189,7 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
       }
       ::selection { background: var(--accent); color: var(--chip-fg); }
 
-      .prompt {
-        color: var(--dim);
-        font-size: 0.85rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 2rem;
-      }
-      .prompt .user { color: var(--green); font-weight: 600; }
-      .prompt .at { color: var(--dim); }
-      .prompt .host { color: var(--blue2); font-weight: 600; }
-      .prompt .colon { color: var(--dim); }
-      .prompt .cwd { color: var(--blue); }
-      .prompt .dollar { color: var(--green); }
-
-      .cmdline { margin: 1.5rem 0 0.75rem; }
-      .cmdline::before { content: "$ "; color: var(--green); }
-      h1.cmdline { font-size: 1.05rem; font-weight: 600; }
-      h2.cmdline { font-size: 1rem; font-weight: 600; }
+      .site-title { font-size: 1.05rem; font-weight: 600; margin: 0 0 1.5rem; }
 
       footer {
         padding: 1.5rem 1.25rem 2.5rem;
@@ -232,19 +210,11 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
     </style>
   </head>
   <body>
-    <script is:inline>
-      window.updateCwd = function (p) {
-        var el = document.querySelector(".prompt .cwd");
-        var label = p || "/";
-        if (el) el.textContent = label;
-        document.title = label === "/" ? "setyanoegraha" : "setyanoegraha · " + label;
-      };
-    </script>
     <div class="statusbar">
       <div class="workspaces">
         {workspaces.map((ws) => (
-          <a class="ws" href={ws.href} aria-current={current === ws.href ? "page" : undefined} title={ws.cmd}>
-            {ws.num}:{ws.label}
+          <a class="ws" href={ws.href} aria-current={current === ws.href ? "page" : undefined}>
+            {ws.label}
           </a>
         ))}
       </div>
@@ -253,14 +223,16 @@ const current = Astro.url.pathname.replace(/\/$/, "") || "/";
     </div>
     <div class="terminal">
       <main>
-        <div class="prompt">
-          <span class="user">nugraha</span><span class="at">@</span><span class="host">setyanoegraha</span><span class="colon">:</span><span class="cwd">{path}</span><span class="dollar">$</span>
-        </div>
+        {Astro.url.pathname === "/" ? (
+          <h1 class="site-title">setyanoegraha</h1>
+        ) : (
+          <p class="site-title">setyanoegraha · {Astro.url.pathname.replace(/\//g, "")}</p>
+        )}
         <slot />
       </main>
       <footer>
         <p class="contact">
-          <span class="exit">exit 0</span> · <a href="mailto:pandu4688@gmail.com">mail</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a> · <a href="https://github.com/setyanoegraha">github</a>
+          <a href="mailto:pandu4688@gmail.com">mail</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a> · <a href="https://github.com/setyanoegraha">github</a>
         </p>
       </footer>
     </div>
