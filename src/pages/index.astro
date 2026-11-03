@@ -1,56 +1,142 @@
 ---
 import Base from "../layouts/Base.astro";
-import { profile } from "../data/profile";
+import { profile, type Project } from "../data/profile";
 
-const HIGHLIGHTS = [
-  "ledger-tui",
-  "revshell-tui",
-  "webapp_osce",
-  "hackmyvm-commandlineinterface",
-];
-const highlights = profile.projects.filter((p) => HIGHLIGHTS.includes(p.name));
+const GITHUB_USER = "setyanoegraha";
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const TOKEN =
+  process.env.GITHUB_TOKEN ?? (import.meta.env.GITHUB_TOKEN as string | undefined);
+let useToken = !!TOKEN && !TOKEN.includes("isi_token");
+
+async function gh<T>(url: string): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const r = await fetch(url, {
+        headers: useToken ? { Authorization: `Bearer ${TOKEN}` } : {},
+      });
+      if (r.ok) return (await r.json()) as T;
+      lastErr = new Error(`HTTP ${r.status}`);
+      if (r.status === 401) {
+        useToken = false;
+        continue;
+      }
+      if (r.status < 500 && r.status !== 429) break;
+    } catch (e) {
+      lastErr = e;
+    }
+    if (attempt < 3) await sleep(2000 * attempt);
+  }
+  throw lastErr;
+}
+
+interface RepoInfo {
+  description: string | null;
+  language: string | null;
+  stargazers_count: number;
+}
+interface Entry {
+  name: string;
+  type: string;
+}
+
+const projects: Project[] = await Promise.all(
+  profile.projects.map(async (p) => {
+    try {
+      const info = await gh<RepoInfo>(`https://api.github.com/repos/${GITHUB_USER}/${p.name}`);
+      return { ...p, description: info.description, language: info.language, stars: info.stargazers_count };
+    } catch {
+      return p;
+    }
+  })
+);
+
+async function countMachines(repo: string): Promise<number | null> {
+  try {
+    const root = await gh<Entry[]>(`https://api.github.com/repos/${GITHUB_USER}/${repo}/contents/`);
+    const hasMachines = root.some((e) => e.type === "dir" && e.name === "machines");
+    const entries = hasMachines
+      ? await gh<Entry[]>(`https://api.github.com/repos/${GITHUB_USER}/${repo}/contents/machines`)
+      : root;
+    return entries.filter((e) => e.type === "dir" && !e.name.startsWith(".")).length;
+  } catch {
+    return null;
+  }
+}
+
+const writing = await Promise.all(
+  profile.writing.map(async (w) => ({ ...w, count: await countMachines(w.name) }))
+);
 ---
 <Base>
-  <h2>Introduction</h2>
-  <p>
-    I'm <strong>{profile.name}</strong>, a {profile.tagline} Most of my time
-    goes into hands-on security labs — 260+ completed across public platforms.
-  </p>
+  <section class="sec sec--first">
+    <h2 class="sec-title"><span class="sec-num">01</span>Introduction</h2>
+    <p>
+      I'm <strong>Nugraha</strong>, a 5th-semester Computer Engineering Technology
+      student at POLINES, Semarang. I spend most of my time in hands-on security
+      labs — 260+ completed across HackMyVM, DockerLabs and VulNyx — and build
+      machines of my own for others to practice on. Currently looking for an IT or
+      security internship.
+    </p>
+  </section>
 
-  <h2>Status</h2>
-  <ul>
-    {profile.status.map((s) => <li>{s}</li>)}
-  </ul>
+  <section class="sec">
+    <h2 class="sec-title"><span class="sec-num">02</span>Status</h2>
+    <dl class="status">
+      {profile.status.map((s) => (
+        <>
+          <dt>{s.label}</dt>
+          <dd>{s.value}</dd>
+        </>
+      ))}
+    </dl>
+  </section>
 
-  <h2>Projects</h2>
-  <ul>
-    {highlights.map((p) => (
-      <li>
-        <a href={p.url} target="_blank" rel="noopener">{p.name}</a>
-      </li>
+  <section class="sec">
+    <h2 class="sec-title"><span class="sec-num">03</span>Projects</h2>
+    {projects.map((p) => (
+      <a class="project" href={p.url} target="_blank" rel="noopener">
+        <span class="project-name">{p.name}</span>
+        <span class="project-meta">{p.language ?? "—"}{p.stars ? ` · ${p.stars}★` : ""}</span>
+        <span class="project-desc">{p.description ?? ""}</span>
+      </a>
     ))}
-  </ul>
-  <p><a href="/projects">see all projects →</a></p>
+  </section>
 
-  <h2>Achievements</h2>
-  <ul>
-    {profile.achievements.map((a) => (
-      <li>
-        {a.url ? <a href={a.url}>{a.title}</a> : <strong>{a.title}</strong>}
-        {" — "}{a.detail}
-      </li>
+  <section class="sec">
+    <h2 class="sec-title"><span class="sec-num">04</span>Achievements</h2>
+    <ol class="achv">
+      {profile.achievements.map((a) => (
+        <li>
+          {a.url ? <a href={a.url} target="_blank" rel="noopener"><strong>{a.title}</strong></a> : <strong>{a.title}</strong>}
+          <span class="achv-detail">{a.detail}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="sec">
+    <h2 class="sec-title"><span class="sec-num">05</span>Writing</h2>
+    {writing.map((w) => (
+      <a class="project project--writing" href={w.url} target="_blank" rel="noopener">
+        <span class="project-name">{w.name}</span>
+        <span class="write-count">{w.count !== null ? `${w.count} machines` : w.note}</span>
+      </a>
     ))}
-  </ul>
+    <p class="more">
+      Full walkthroughs live in the repos — start with the machine index on{" "}
+      <a href="https://github.com/setyanoegraha?tab=repositories" target="_blank" rel="noopener">GitHub</a>.
+    </p>
+  </section>
 
-  <h2>Blog</h2>
-  <p>
-    Full walkthroughs of every lab I complete — <a href="/blog">read the blog →</a>
-  </p>
-
-  <h2>Contact</h2>
-  <ul>
-    <li><a href={profile.links.github} target="_blank" rel="noopener">github</a></li>
-    <li><a href={profile.links.linkedin} target="_blank" rel="noopener">linkedin</a></li>
-    <li><a href={`mailto:${profile.links.email}`}>email</a></li>
-  </ul>
+  <section class="sec">
+    <h2 class="sec-title"><span class="sec-num">06</span>Contact</h2>
+    <p class="contact">
+      <a href={`mailto:${profile.links.email}`}>email</a> ·
+      <a href={profile.links.github} target="_blank" rel="noopener">GitHub</a> ·
+      <a href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </section>
 </Base>

@@ -12,16 +12,25 @@ export interface Achievement {
   url?: string;
 }
 
+export interface StatusItem {
+  label: string;
+  value: string;
+}
+
+export interface Writing {
+  name: string;
+  url: string;
+  note: string;
+}
+
 export const profile = {
   name: "Nugraha",
-  tagline:
-    "Computer Engineering Technology student at POLINES — looking for an IT/security internship.",
   status: [
-    "seeking IT/security internship",
-    "5th semester · Computer Engineering Technology, POLINES",
-    "completing hands-on security labs weekly",
-    "building vulnerable lab machines",
-  ],
+    { label: "Availability", value: "IT / security internship, 2026" },
+    { label: "Semester", value: "5th · Computer Engineering Technology, POLINES" },
+    { label: "Based", value: "Semarang, Indonesia" },
+    { label: "Currently", value: "hands-on security labs and lab-machine development" },
+  ] as StatusItem[],
   links: {
     github: "https://github.com/setyanoegraha",
     linkedin: "https://www.linkedin.com/in/setyanoegraha/",
@@ -40,12 +49,12 @@ export const profile = {
     {
       title: "260+ hands-on security labs completed",
       detail: "practical exercises across HackMyVM, DockerLabs and VulNyx platforms",
-      url: "/labs",
+      url: "https://github.com/setyanoegraha?tab=repositories",
     },
     {
       title: "Published vulnerable lab machines",
       detail: "authored machines published on DockerLabs, HackMyVM and VulNyx",
-      url: "/labs",
+      url: "https://github.com/setyanoegraha?tab=repositories",
     },
     {
       title: "Built own lab-progress toolkit",
@@ -53,4 +62,9 @@ export const profile = {
       url: "https://github.com/setyanoegraha/hackmyvm-commandlineinterface",
     },
   ] as Achievement[],
+  writing: [
+    { name: "hackmyvm-writeups", url: "https://github.com/setyanoegraha/hackmyvm-writeups", note: "HackMyVM walkthroughs" },
+    { name: "vulnyx-writeups", url: "https://github.com/setyanoegraha/vulnyx-writeups", note: "VulNyx walkthroughs" },
+    { name: "dockerlabs-writeups", url: "https://github.com/setyanoegraha/dockerlabs-writeups", note: "DockerLabs walkthroughs" },
+  ] as Writing[],
 };

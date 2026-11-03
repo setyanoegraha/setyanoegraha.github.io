@@ -1,30 +1,25 @@
 ---
-const workspaces = [
-  { label: "home", href: "/" },
-  { label: "projects", href: "/projects" },
-  { label: "labs", href: "/labs" },
-  { label: "blog", href: "/blog" },
-];
-const current = Astro.url.pathname.replace(/\/$/, "") || "/";
-const fullTitle = "setyanoegraha";
+const fullTitle = "Nugraha — IT & Security Portfolio";
+const description =
+  "Nugraha — computer engineering student at POLINES. IT and security internship candidate. Projects, labs and writeups.";
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Nugraha — computer engineering student building and breaking things in IT security. Projects, labs, writeups." />
+    <meta name="description" content={description} />
     <link rel="icon" href="https://github.com/setyanoegraha.png" />
     <meta name="referrer" content="no-referrer" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="setyanoegraha" />
+    <meta property="og:site_name" content="Nugraha" />
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content="Nugraha — computer engineering student building and breaking things in IT security. Projects, labs, writeups." />
+    <meta property="og:description" content={description} />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:image" content="https://github.com/setyanoegraha.png" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content="Nugraha — computer engineering student building and breaking things in IT security. Projects, labs, writeups." />
+    <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content="https://github.com/setyanoegraha.png" />
     <link rel="canonical" href={Astro.url} />
     <title>{fullTitle}</title>
@@ -40,219 +35,239 @@ const fullTitle = "setyanoegraha";
     <style is:global>
       :root {
         color-scheme: light;
-        --nord0:  #eceff4;
-        --nord1:  #e5e9f0;
-        --nord2:  #d8dee9;
-        --nord3:  #4c566a;
-        --nord4:  #2e3440;
-        --nord7:  #2f6b70;
-        --nord8:  #3a6b94;
-        --nord9:  #44698f;
-        --nord11: #a03b45;
-        --nord12: #8a5127;
-        --nord13: #7a5a1e;
-        --nord14: #3f6b34;
-        --nord15: #6f4a86;
-
-        --bg:      var(--nord0);
-        --bg-alt:  var(--nord1);
-        --fg:      var(--nord4);
-        --dim:     var(--nord3);
-        --border:  var(--nord2);
-        --green:   var(--nord14);
-        --blue:    var(--nord8);
-        --blue2:   var(--nord9);
-        --accent:  #3a6b94;
-        --accent-ink: #2f5f88;
-        --chip-fg: #ffffff;
-        --red:     var(--nord11);
-        --orange:  var(--nord12);
-        --yellow:  var(--nord13);
-        --cyan:    var(--nord7);
+        --bg: #fcfbf8;
+        --bg-alt: #f4f1ea;
+        --fg: #1a1917;
+        --dim: #6b6862;
+        --border: #e2ded4;
+        --accent: #8c3b25;
+        --accent-ink: #6d2c1b;
+        --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       }
 
       :root[data-theme="dark"] {
         color-scheme: dark;
-        --nord0:  #2e3440;
-        --nord1:  #3b4252;
-        --nord2:  #434c5e;
-        --nord3:  #a8b0c0;
-        --nord4:  #d8dee9;
-        --nord7:  #8fbcbb;
-        --nord8:  #88c0d0;
-        --nord9:  #9db4cd;
-        --nord11: #e2a2a8;
-        --nord12: #dda483;
-        --nord13: #ebcb8b;
-        --nord14: #a3be8c;
-        --nord15: #c4a6cf;
-
-        --bg:      var(--nord0);
-        --bg-alt:  var(--nord1);
-        --fg:      var(--nord4);
-        --dim:     var(--nord3);
-        --border:  var(--nord2);
-        --green:   var(--nord14);
-        --blue:    var(--nord8);
-        --blue2:   var(--nord9);
-        --accent:  #4a6484;
-        --accent-ink: #88c0d0;
-        --chip-fg: #eceff4;
-        --red:     var(--nord11);
-        --orange:  var(--nord12);
-        --yellow:  var(--nord13);
-        --cyan:    var(--nord7);
+        --bg: #16150f;
+        --bg-alt: #1f1d16;
+        --fg: #e8e4da;
+        --dim: #9a958a;
+        --border: #2f2c23;
+        --accent: #d98d6b;
+        --accent-ink: #e8a888;
       }
-      * { box-sizing: border-box; border-radius: 0 !important; }
-      html { scroll-behavior: smooth; }
+
+      * { box-sizing: border-box; }
+
       body {
         margin: 0;
         background: var(--bg);
         color: var(--fg);
-        font-family: ui-monospace, "JetBrains Mono", "Fira Code", "Cascadia Code", Menlo, Consolas, monospace;
-        font-size: 15px;
-        line-height: 1.75;
+        font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+        font-size: 17px;
+        line-height: 1.65;
         -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
       }
 
-      .statusbar {
-        position: sticky;
-        top: 0;
-        z-index: 100;
+      .wrap {
+        max-width: 46rem;
+        margin: 0 auto;
+        padding: 4.5rem 1.5rem 6rem;
+      }
+
+      .top {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        background: var(--bg-alt);
-        border-bottom: 1px solid var(--border);
-        padding: 0 0.5rem;
-        height: 2rem;
-        font-size: 0.78rem;
-        flex-wrap: wrap;
+        align-items: baseline;
+        margin-bottom: 3rem;
+        font-family: var(--sans);
       }
-      .statusbar .workspaces {
-        display: flex;
-        gap: 0.15rem;
-      }
-      .statusbar .ws {
-        padding: 0.2rem 0.5rem;
-        color: var(--nord4);
-        opacity: 0.75;
-        text-decoration: none;
-        cursor: pointer;
-        line-height: 1.5;
-      }
-      .statusbar .ws:hover {
-        color: var(--nord4);
-        opacity: 0.85;
-        text-decoration: none;
-      }
-      .statusbar .ws[aria-current="page"] {
-        background: var(--accent);
-        color: var(--chip-fg);
-        font-weight: 600;
-        opacity: 1;
-      }
-      .statusbar #theme-toggle {
-        background: none;
-        border: 1px solid var(--border);
+      .brand {
         color: var(--fg);
-        font-family: inherit;
-        font-size: 0.75rem;
-        padding: 0.1rem 0.5rem;
-        cursor: pointer;
-        min-height: 24px;
-        margin-left: 0.75rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        text-decoration: none;
       }
-      .statusbar #theme-toggle:hover { border-color: var(--accent-ink); color: var(--accent-ink); }
-      .statusbar #theme-toggle:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
-      .statusbar #clock {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+      #theme-toggle {
+        background: none;
+        border: none;
+        padding: 0;
         color: var(--dim);
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      #theme-toggle:hover { color: var(--accent); }
+
+      .sec {
+        border-top: 1px solid var(--border);
+        padding-top: 1.75rem;
+        margin-top: 2.5rem;
+      }
+      .sec--first {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+      }
+      .sec-title {
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--dim);
+        margin: 0 0 1.25rem;
+        display: flex;
+        gap: 0.75rem;
+        align-items: baseline;
+      }
+      .sec-num {
+        color: var(--accent);
         font-variant-numeric: tabular-nums;
       }
 
-      .terminal {
-        max-width: 52rem;
-        margin: 0 auto;
+      a {
+        color: var(--fg);
+        text-decoration: underline;
+        text-decoration-color: var(--border);
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
       }
-      main {
-        padding: 2rem 1.25rem 3rem;
+      a:hover {
+        color: var(--accent);
+        text-decoration-color: var(--accent);
       }
-      a { color: var(--blue); text-decoration: none; }
-      a:hover { text-decoration: underline; text-underline-offset: 3px; }
-      :where(a, button, summary, input, [tabindex]):focus-visible {
-        outline: 2px solid var(--accent-ink);
-        outline-offset: 2px;
-      }
-      ::selection { background: var(--accent); color: var(--chip-fg); }
 
-      .site-title { font-size: 1.05rem; font-weight: 600; margin: 0 0 1.5rem; }
+      :where(a, button):focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+      ::selection {
+        background: var(--accent);
+        color: var(--bg);
+      }
+
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 1rem;
+        letter-spacing: -0.01em;
+      }
+
+      .status {
+        display: grid;
+        grid-template-columns: 9rem 1fr;
+        gap: 0.5rem 1.5rem;
+        margin: 0;
+      }
+      .status dt {
+        font-family: var(--sans);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--dim);
+        padding-top: 0.2rem;
+      }
+      .status dd { margin: 0; }
+      @media (max-width: 560px) {
+        .status { grid-template-columns: 1fr; gap: 0.15rem; }
+        .status dd { margin-bottom: 0.6rem; }
+      }
+
+      .project {
+        display: grid;
+        grid-template-columns: 15rem 5rem 1fr;
+        gap: 0 1rem;
+        align-items: baseline;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border);
+        text-decoration: none;
+      }
+      .project:last-child { border-bottom: 0; }
+      .project-name {
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .project-meta {
+        font-family: var(--sans);
+        font-size: 12px;
+        color: var(--dim);
+      }
+      .project-desc {
+        font-size: 15px;
+        color: var(--dim);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .project:hover .project-name {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+      @media (max-width: 640px) {
+        .project { grid-template-columns: 1fr; gap: 0.1rem; }
+        .project-meta { display: none; }
+      }
+
+      .project--writing {
+        grid-template-columns: 13rem 1fr;
+      }
+      .project--writing .project-name { font-weight: 500; }
+      @media (max-width: 640px) {
+        .project--writing { grid-template-columns: 1fr; }
+      }
+
+      .write-count {
+        font-family: var(--sans);
+        font-size: 12px;
+        color: var(--dim);
+      }
+
+      .achv {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+      }
+      .achv li {
+        border-left: 2px solid var(--border);
+        padding-left: 1rem;
+      }
+      .achv-detail {
+        display: block;
+        font-size: 15px;
+        color: var(--dim);
+      }
+
+      .contact {
+        font-family: var(--sans);
+        font-size: 14px;
+      }
 
       footer {
-        padding: 1.5rem 1.25rem 2.5rem;
-        color: var(--dim);
-        font-size: 0.8rem;
+        margin-top: 4rem;
+        padding-top: 1.5rem;
         border-top: 1px solid var(--border);
-      }
-      footer .contact { margin: 0; }
-      footer .exit { color: var(--green); }
-
-      @media (max-width: 480px) {
-        body { font-size: 13.5px; }
-        .statusbar { height: auto; padding: 0.25rem 0.5rem; }
-      }
-      @media (max-width: 700px) {
-        .statusbar #clock { display: none; }
+        font-family: var(--sans);
+        font-size: 12px;
+        color: var(--dim);
       }
     </style>
   </head>
   <body>
-    <div class="statusbar">
-      <div class="workspaces">
-        {workspaces.map((ws) => (
-          <a class="ws" href={ws.href} aria-current={current === ws.href ? "page" : undefined}>
-            {ws.label}
-          </a>
-        ))}
-      </div>
-      <span id="clock">--:--</span>
-      <button id="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">theme</button>
-    </div>
-    <div class="terminal">
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="/">Nugraha</a>
+        <button id="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false">dark</button>
+      </header>
       <main>
-        {Astro.url.pathname === "/" ? (
-          <h1 class="site-title">setyanoegraha</h1>
-        ) : (
-          <p class="site-title">setyanoegraha · {Astro.url.pathname.replace(/\//g, "")}</p>
-        )}
         <slot />
       </main>
-      <footer>
-        <p class="contact">
-          <a href="mailto:pandu4688@gmail.com">mail</a> · <a href="https://www.linkedin.com/in/setyanoegraha/">linkedin</a> · <a href="https://github.com/setyanoegraha">github</a>
-        </p>
-      </footer>
+      <footer>© {new Date().getFullYear()} Nugraha · built with Astro</footer>
     </div>
-    <script is:inline>
-      (function () {
-        function updateClock() {
-          var el = document.getElementById("clock");
-          if (!el) return;
-          var fmt = new Intl.DateTimeFormat("en-GB", {
-            timeZone: "Asia/Jakarta",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-          el.textContent = fmt.format(new Date()) + " WIB";
-        }
-        updateClock();
-        setInterval(updateClock, 30000);
-      })();
-    </script>
     <script is:inline>
       (function () {
         var btn = document.getElementById("theme-toggle");
