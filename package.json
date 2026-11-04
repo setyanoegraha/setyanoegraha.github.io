@@ -10,6 +10,10 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "astro": "^7.2.4"
+    "astro": "^7.2.4",
+    "dompurify": "^3.4.17",
+    "highlight.js": "^11.12.0",
+    "marked": "^18.1.3",
+    "marked-highlight": "^2.2.4"
   }
 }

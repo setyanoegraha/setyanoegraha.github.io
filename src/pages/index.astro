@@ -1,142 +1,50 @@
 ---
 import Base from "../layouts/Base.astro";
-import { profile, type Project } from "../data/profile";
-
-const GITHUB_USER = "setyanoegraha";
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-const TOKEN =
-  process.env.GITHUB_TOKEN ?? (import.meta.env.GITHUB_TOKEN as string | undefined);
-let useToken = !!TOKEN && !TOKEN.includes("isi_token");
-
-async function gh<T>(url: string): Promise<T> {
-  let lastErr: unknown;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const r = await fetch(url, {
-        headers: useToken ? { Authorization: `Bearer ${TOKEN}` } : {},
-      });
-      if (r.ok) return (await r.json()) as T;
-      lastErr = new Error(`HTTP ${r.status}`);
-      if (r.status === 401) {
-        useToken = false;
-        continue;
-      }
-      if (r.status < 500 && r.status !== 429) break;
-    } catch (e) {
-      lastErr = e;
-    }
-    if (attempt < 3) await sleep(2000 * attempt);
-  }
-  throw lastErr;
-}
-
-interface RepoInfo {
-  description: string | null;
-  language: string | null;
-  stargazers_count: number;
-}
-interface Entry {
-  name: string;
-  type: string;
-}
-
-const projects: Project[] = await Promise.all(
-  profile.projects.map(async (p) => {
-    try {
-      const info = await gh<RepoInfo>(`https://api.github.com/repos/${GITHUB_USER}/${p.name}`);
-      return { ...p, description: info.description, language: info.language, stars: info.stargazers_count };
-    } catch {
-      return p;
-    }
-  })
-);
-
-async function countMachines(repo: string): Promise<number | null> {
-  try {
-    const root = await gh<Entry[]>(`https://api.github.com/repos/${GITHUB_USER}/${repo}/contents/`);
-    const hasMachines = root.some((e) => e.type === "dir" && e.name === "machines");
-    const entries = hasMachines
-      ? await gh<Entry[]>(`https://api.github.com/repos/${GITHUB_USER}/${repo}/contents/machines`)
-      : root;
-    return entries.filter((e) => e.type === "dir" && !e.name.startsWith(".")).length;
-  } catch {
-    return null;
-  }
-}
-
-const writing = await Promise.all(
-  profile.writing.map(async (w) => ({ ...w, count: await countMachines(w.name) }))
-);
 ---
 <Base>
-  <section class="sec sec--first">
-    <h2 class="sec-title"><span class="sec-num">01</span>Introduction</h2>
-    <p>
-      I'm <strong>Nugraha</strong>, a 5th-semester Computer Engineering Technology
-      student at POLINES, Semarang. I spend most of my time in hands-on security
-      labs — 260+ completed across HackMyVM, DockerLabs and VulNyx — and build
-      machines of my own for others to practice on. Currently looking for an IT or
-      security internship.
-    </p>
-  </section>
-
-  <section class="sec">
-    <h2 class="sec-title"><span class="sec-num">02</span>Status</h2>
-    <dl class="status">
-      {profile.status.map((s) => (
-        <>
-          <dt>{s.label}</dt>
-          <dd>{s.value}</dd>
-        </>
-      ))}
-    </dl>
-  </section>
-
-  <section class="sec">
-    <h2 class="sec-title"><span class="sec-num">03</span>Projects</h2>
-    {projects.map((p) => (
-      <a class="project" href={p.url} target="_blank" rel="noopener">
-        <span class="project-name">{p.name}</span>
-        <span class="project-meta">{p.language ?? "—"}{p.stars ? ` · ${p.stars}★` : ""}</span>
-        <span class="project-desc">{p.description ?? ""}</span>
-      </a>
-    ))}
-  </section>
-
-  <section class="sec">
-    <h2 class="sec-title"><span class="sec-num">04</span>Achievements</h2>
-    <ol class="achv">
-      {profile.achievements.map((a) => (
-        <li>
-          {a.url ? <a href={a.url} target="_blank" rel="noopener"><strong>{a.title}</strong></a> : <strong>{a.title}</strong>}
-          <span class="achv-detail">{a.detail}</span>
-        </li>
-      ))}
-    </ol>
-  </section>
-
-  <section class="sec">
-    <h2 class="sec-title"><span class="sec-num">05</span>Writing</h2>
-    {writing.map((w) => (
-      <a class="project project--writing" href={w.url} target="_blank" rel="noopener">
-        <span class="project-name">{w.name}</span>
-        <span class="write-count">{w.count !== null ? `${w.count} machines` : w.note}</span>
-      </a>
-    ))}
-    <p class="more">
-      Full walkthroughs live in the repos — start with the machine index on{" "}
-      <a href="https://github.com/setyanoegraha?tab=repositories" target="_blank" rel="noopener">GitHub</a>.
-    </p>
-  </section>
-
-  <section class="sec">
-    <h2 class="sec-title"><span class="sec-num">06</span>Contact</h2>
-    <p class="contact">
-      <a href={`mailto:${profile.links.email}`}>email</a> ·
-      <a href={profile.links.github} target="_blank" rel="noopener">GitHub</a> ·
-      <a href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>
-    </p>
-  </section>
+  <p class="lede">
+    Hi, I'm <strong>Nugraha</strong>. I spend most of my time inside Linux
+    terminals, taking systems apart to understand how they break and how to
+    secure them.
+  </p>
+  <p class="lede">
+    Over the past year, I've worked through more than 260 hands-on labs across
+    HackMyVM, DockerLabs, and VulNyx. After spending enough hours breaking into
+    machines built by others, I started designing and publishing vulnerable
+    machines of my own for the community to practice on. Four of them are live
+    now: Groups on VulNyx, Ledger and Grenade on HackMyVM, and Hannah Coffee on
+    DockerLabs.
+  </p>
+  <p class="lede">
+    The tools I build along the way are small and self-contained, usually because
+    I got tired of repeating the same steps by hand. Shellcraft, Ledger, and the
+    three platform consoles are all on{" "}
+    <a class="ep" href="/projects">the projects page</a>,
+    newest first.
+  </p>
+  <p class="lede">
+    I keep a record of what shipped and when, both software and lab machines,
+    on{" "}
+    <a class="ep" href="/milestones">the milestones page</a>.
+    Each entry links back to the repository or platform that produced it.
+  </p>
+  <p class="lede">
+    Whenever I finish an interesting box, I write the full walkthrough and host it
+    here. All 304 of them are readable on{" "}
+    <a class="ep" href="/writing">the writing page</a>,
+    without an account or a download.
+  </p>
+  <p class="lede">
+    I'm based in Semarang and currently in my fifth semester of Computer
+    Engineering Technology at <a href="https://polines.ac.id/id" target="_blank" rel="noopener">Semarang State Polytechnic</a>. For 2026, I'm looking for an IT or security
+    internship where I can work on real systems and learn from experienced
+    engineers.
+  </p>
+  <p class="lede">
+    If any of that is useful, reach me by{" "}
+    <a href="mailto:pandu4688@gmail.com">email</a>,{" "}
+    <a href="https://github.com/setyanoegraha" target="_blank" rel="noopener">GitHub</a>,
+    or{" "}
+    <a href="https://www.linkedin.com/in/setyanoegraha/" target="_blank" rel="noopener">LinkedIn</a>.
+  </p>
 </Base>

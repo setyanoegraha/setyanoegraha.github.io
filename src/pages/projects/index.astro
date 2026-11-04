@@ -1,0 +1,46 @@
+---
+import Base from "../../layouts/Base.astro";
+import { profile } from "../../data/profile";
+
+const sorted = [...profile.projects].sort((a, b) => b.date.localeCompare(a.date));
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const years: { year: string; months: { key: string; label: string; items: typeof sorted }[] }[] = [];
+for (const p of sorted) {
+  const [y, m] = p.date.split("-");
+  let year = years.at(-1);
+  if (!year || year.year !== y) {
+    year = { year: y, months: [] };
+    years.push(year);
+  }
+  const lastMonth = year.months.at(-1);
+  if (lastMonth && lastMonth.key === p.date) lastMonth.items.push(p);
+  else year.months.push({ key: p.date, label: MONTHS[Number(m) - 1], items: [p] });
+}
+---
+<Base>
+  <h1>Projects</h1>
+  <p>
+    Small tools I built to make my own work easier. Most of them started as an
+    annoyance I got tired of repeating.
+  </p>
+  {years.map(({ year, months }) => (
+    <>
+      <h2 class="year-head">{year}</h2>
+      {months.map(({ label, items }) => (
+        <>
+          <h3 class="group">{label}</h3>
+          <ul class="list">
+            {items.map((p) => (
+              <li>
+                <a class="entry" href={p.url} target="_blank" rel="noopener">
+                  <span class="entry-name">{p.name}</span>
+                  <span class="entry-desc">{p.description}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      ))}
+    </>
+  ))}
+</Base>

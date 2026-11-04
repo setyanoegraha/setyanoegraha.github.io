@@ -1,0 +1,556 @@
+---
+import Base from "../../layouts/Base.astro";
+// snapshot refreshed manually; run the build with GITHUB_TOKEN to update
+import writeupsFallback from "../../data/writeups.json";
+
+const GITHUB_USER = "setyanoegraha";
+
+const repoLabel = (name: string) =>
+  name
+    .replace(/-writeups$/, " walkthroughs")
+    .replace(/^hackmyvm/, "HackMyVM")
+    .replace(/^dockerlabs/, "DockerLabs")
+    .replace(/^vulnyx/, "VulNyx")
+    .replace(/^./, (c) => c.toUpperCase());
+
+interface Repo {
+  name: string;
+  fork: boolean;
+  pushed_at: string;
+  default_branch: string;
+}
+interface Entry {
+  name: string;
+  type: string;
+}
+interface IndexedRepo {
+  name: string;
+  branch: string;
+  prefix: string;
+  machines: string[];
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const TOKEN =
+  process.env.GITHUB_TOKEN ?? (import.meta.env.GITHUB_TOKEN as string | undefined);
+let useToken = !!TOKEN && !TOKEN.includes("isi_token");
+
+async function gh<T>(url: string): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const r = await fetch(url, {
+        headers: useToken ? { Authorization: `Bearer ${TOKEN}` } : {},
+      });
+      if (r.ok) return (await r.json()) as T;
+      lastErr = new Error(`HTTP ${r.status}`);
+      if (r.status === 401) {
+        useToken = false;
+        continue;
+      }
+      if (r.status < 500 && r.status !== 429) break;
+    } catch (e) {
+      lastErr = e;
+    }
+    if (attempt < 3) await sleep(2000 * attempt);
+  }
+  throw lastErr;
+}
+
+const SHOWCASED_WRITEUPS = [
+  "hackmyvm-writeups",
+  "vulnyx-writeups",
+  "dockerlabs-writeups",
+];
+
+let repos: IndexedRepo[] = [];
+let error: string | null = null;
+
+try {
+  const all = await gh<Repo[]>(
+    `https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&per_page=100`
+  );
+  const writeups = all
+    .filter((r) => SHOWCASED_WRITEUPS.includes(r.name))
+    .sort((a, b) => b.pushed_at.localeCompare(a.pushed_at));
+
+  for (const repo of writeups) {
+    let entries = await gh<Entry[]>(
+      `https://api.github.com/repos/${GITHUB_USER}/${repo.name}/contents/`
+    );
+    const hasMachinesDir = entries.some(
+      (e) => e.type === "dir" && e.name === "machines"
+    );
+    if (hasMachinesDir) {
+      entries = await gh<Entry[]>(
+        `https://api.github.com/repos/${GITHUB_USER}/${repo.name}/contents/machines`
+      );
+    }
+    repos.push({
+      name: repo.name,
+      branch: repo.default_branch,
+      prefix: hasMachinesDir ? "machines/" : "",
+      machines: entries
+        .filter((e) => e.type === "dir" && !e.name.startsWith("."))
+        .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+        .map((e) => e.name),
+    });
+  }
+} catch (e) {
+  error = e instanceof Error ? e.message : String(e);
+}
+
+let source: "api" | "snapshot" = "api";
+if (repos.length === 0) {
+  repos = writeupsFallback as IndexedRepo[];
+  source = "snapshot";
+  error = null;
+}
+---
+<Base>
+  <div id="writing-root">
+    <div id="viewer" hidden>
+      <button id="back-link" type="button">All walkthroughs</button>
+      <details id="toc-pane">
+        <summary>On this page</summary>
+        <nav id="toc-list"></nav>
+      </details>
+      <article id="article"></article>
+    </div>
+    <div id="index">
+      <h1>Writing</h1>
+      <p>Every machine I finish gets a walkthrough. Pick one and read it here. Hopefully you learn something new.</p>
+      {error ? (
+        <p class="empty">
+          Walkthrough files are on GitHub for now.{" "}
+          {SHOWCASED_WRITEUPS.map((name, i) => (
+            <>
+              {i > 0 && " · "}
+              <a href={`https://github.com/${GITHUB_USER}/${name}`} target="_blank" rel="noopener">{name}</a>
+            </>
+          ))}
+        </p>
+      ) : (
+        <>
+          {repos.map((repo) => (
+            <section class="repo">
+              <div class="entry-row repo-head">
+                <span class="entry-name">{repoLabel(repo.name)}</span>
+                <span class="leader" aria-hidden="true"></span>
+                <span class="entry-meta">{repo.machines.length} machines</span>
+              </div>
+              {repo.machines.length === 0 ? (
+                <p class="empty">No machines indexed yet.</p>
+              ) : (
+                <div class="machines">
+                  {repo.machines.map((m) => (
+                    <a
+                      href={`#${repo.name}/${repo.prefix}${m}`}
+                      data-repo={repo.name}
+                      data-branch={repo.branch}
+                      data-dir={m}
+                      data-prefix={repo.prefix}
+                    >{m}</a>
+                  ))}
+                </div>
+              )}
+            </section>
+          ))}
+        </>
+      )}
+    </div>
+
+    <style>
+      :global(#writing-root .entry-meta) {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--dim);
+      }
+      :global(#writing-root .repo-head) { margin: 0 0 0.6rem; }
+      :global(#writing-root .repo) { margin-bottom: 2rem; }
+      :global(#writing-root .repo h2) {
+        font-size: 1.15rem;
+        margin: 0 0 0.5rem;
+      }
+      :global(#writing-root .machines) {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+        gap: 0.15rem 1.2rem;
+        font-size: 15.5px;
+        content-visibility: auto;
+        contain-intrinsic-size: 0 20rem;
+      }
+      :global(#writing-root .machines a) {
+        font-family: var(--sans);
+        font-size: 15.5px;
+        color: var(--fg);
+        text-decoration: none;
+      }
+      :global(#writing-root .machines a:hover) {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+      :global(#writing-root #back-link) {
+        background: none;
+        border: 0;
+        padding: 0;
+        font: inherit;
+        font-size: 14px;
+        color: var(--dim);
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+      }
+      :global(#writing-root #back-link:hover) { color: var(--accent); }
+      :global(#writing-root #toc-pane) {
+        margin: 1.5rem 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 0.6rem 0;
+        font-size: 14px;
+      }
+      :global(#writing-root #toc-pane > summary) {
+        cursor: pointer;
+        color: var(--dim);
+        font-family: var(--sans);
+        font-size: 13px;
+      }
+      :global(#writing-root #toc-list) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        margin-top: 0.5rem;
+      }
+      :global(#writing-root #toc-list a) { color: var(--fg); text-decoration: none; }
+      :global(#writing-root #toc-list a:hover) { color: var(--accent); }
+      :global(#writing-root #toc-list .toc-h2) { padding-left: 0.75rem; }
+      :global(#writing-root #toc-list .toc-h3) { padding-left: 1.5rem; font-size: 13px; }
+
+      @media (min-width: 1100px) {
+        :global(body:has(#viewer.open-toc) .wrap) { max-width: 48rem; }
+        :global(#writing-root #toc-pane) {
+          position: fixed;
+          left: 1.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 220px;
+          max-height: calc(100vh - 4rem);
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          margin: 0;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          padding: 0.9rem 1rem;
+        }
+      }
+      @media (max-width: 1099px) {
+        :global(#writing-root #toc-pane) { display: none; }
+      }
+
+      :global(#writing-root #article) {
+        font-family: var(--sans);
+        font-size: 17px;
+        line-height: 1.78;
+      }
+      :global(#writing-root #article p),
+      :global(#writing-root #article ul),
+      :global(#writing-root #article ol) { margin: 0 0 1.1em; }
+      :global(#writing-root #article h1),
+      :global(#writing-root #article h2),
+      :global(#writing-root #article h3) {
+        color: var(--fg);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        border-bottom: none;
+        scroll-margin-top: 1rem;
+      }
+      :global(#writing-root #article h1) { font-size: 1.5rem; }
+      :global(#writing-root #article h2) { font-size: 1.22rem; }
+      :global(#writing-root #article h3) { font-size: 1.05rem; }
+      :global(#writing-root #article a) { color: var(--accent); }
+      :global(#writing-root #article code) {
+        font-family: var(--mono);
+        font-size: 0.87em;
+        background: var(--alt);
+        padding: 0.12em 0.3em;
+      }
+      :global(#writing-root #article pre) {
+        font-family: var(--mono);
+        background: var(--alt);
+        border: 1px solid var(--border);
+        padding: 1rem 3.5rem 1rem 1rem;
+        overflow-x: auto;
+        contain: paint;
+        font-size: 13.5px;
+        line-height: 1.6;
+      }
+      :global(#writing-root #article pre code) { background: none; padding: 0; }
+      :global(#writing-root #article .hljs-keyword),
+      :global(#writing-root #article .hljs-selector-tag),
+      :global(#writing-root #article .hljs-literal),
+      :global(#writing-root #article .hljs-name) { color: var(--tok-key); }
+      :global(#writing-root #article .hljs-string),
+      :global(#writing-root #article .hljs-doctag),
+      :global(#writing-root #article .hljs-addition) { color: var(--tok-str); }
+      :global(#writing-root #article .hljs-number),
+      :global(#writing-root #article .hljs-regexp) { color: var(--tok-num); }
+      :global(#writing-root #article .hljs-title),
+      :global(#writing-root #article .hljs-section),
+      :global(#writing-root #article .hljs-built_in),
+      :global(#writing-root #article .hljs-type) { color: var(--tok-fn); }
+      :global(#writing-root #article .hljs-comment),
+      :global(#writing-root #article .hljs-quote) { color: var(--dim); font-style: italic; }
+      :global(#writing-root #article .code-block-wrapper) { position: relative; }
+      :global(#writing-root #article .copy-btn) {
+        position: absolute;
+        top: 0.55rem;
+        right: 0.55rem;
+        font-family: var(--sans);
+        font-size: 11px;
+        color: var(--dim);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        padding: 0.2rem 0.45rem;
+        cursor: pointer;
+      }
+      :global(#writing-root #article .copy-btn:hover) {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      :global(#writing-root #article blockquote) {
+        border-left: 2px solid var(--border);
+        margin: 0 0 1.1em;
+        padding-left: 1rem;
+        color: var(--dim);
+      }
+      :global(#writing-root #article img) { max-width: 100%; }
+      :global(#writing-root #article table) { border-collapse: collapse; width: 100%; }
+      :global(#writing-root #article th),
+      :global(#writing-root #article td) {
+        border: 1px solid var(--border);
+        padding: 0.35rem 0.6rem;
+      }
+    </style>
+
+    <script>
+      import { Marked } from "marked";
+      import { markedHighlight } from "marked-highlight";
+      import hljs from "highlight.js/lib/common";
+      import DOMPurify from "dompurify";
+
+      const GITHUB_USER = "setyanoegraha";
+
+      const viewerEl = document.getElementById("viewer")!;
+      const indexEl = document.getElementById("index")!;
+      const articleEl = document.getElementById("article")!;
+      const tocPane = document.getElementById("toc-pane")!;
+      const backLink = document.getElementById("back-link")!;
+
+      interface MachineLink {
+        repo: string;
+        branch: string;
+        dir: string;
+        prefix: string;
+      }
+
+      function rawUrl(m: MachineLink, file: string): string {
+        return `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/${file}`;
+      }
+
+      async function openWriteup(m: MachineLink) {
+        viewerEl.hidden = false;
+        indexEl.hidden = true;
+        articleEl.innerHTML = `<p class="empty">Loading ${m.dir}.md</p>`;
+        window.scrollTo({ top: 0 });
+
+        let md: string | null = null;
+        for (const file of [`${m.dir}.md`, `${m.dir.toLowerCase()}.md`, "README.md"]) {
+          try {
+            const r = await fetch(rawUrl(m, file));
+            if (r.ok) {
+              md = await r.text();
+              break;
+            }
+          } catch {}
+        }
+
+        if (md === null) {
+          articleEl.innerHTML =
+            `<p class="empty">Could not load this walkthrough. ` +
+            `<a href="https://github.com/${GITHUB_USER}/${m.repo}/tree/${m.branch}/${m.prefix}${m.dir}" target="_blank" rel="noopener">Open it on GitHub</a>.</p>`;
+          return;
+        }
+
+        articleEl.innerHTML = DOMPurify.sanitize(
+          new Marked(
+            markedHighlight({
+              emptyLangClass: "hljs",
+              langPrefix: "hljs language-",
+              highlight(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : "plaintext";
+                return hljs.highlight(code, { language }).value;
+              },
+            }),
+            {
+              walkTokens(token) {
+                if (
+                  token.type === "image" &&
+                  token.href &&
+                  !/^(https?:|data:|#|\/\/)/.test(token.href)
+                ) {
+                  const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
+                  // resolve relative to the machine dir; legacy refs like "machines/X/image.png" or
+                  // "../agent/images/img.png" from pre-normalization writeups are stripped/joined safely
+                  let rel = token.href.replace(/^\.\//, "");
+                  rel = rel.replace(/^machines\/[^/]+\//, "");
+                  token.href = base + rel.split("/").map(encodeURIComponent).join("/");
+                }
+              },
+              renderer: {
+                heading(token) {
+                  const inline = this.parser.parseInline(token.tokens);
+                  const slug = inline
+                    .toLowerCase()
+                    .replace(/<[^>]+>/g, "")
+                    .replace(/[^\w\s-]/g, "")
+                    .trim()
+                    .replace(/\s+/g, "-");
+                  return `<h${token.depth} id="${slug}">${inline}</h${token.depth}>`;
+                },
+              },
+            }
+          ).parse(md, { async: false })
+        );
+        buildToc();
+        attachCopyButtons();
+        history.replaceState(null, "", `#${m.repo}/${m.prefix}${m.dir}`);
+      }
+
+      function buildToc() {
+        const tocEl = document.getElementById("toc-list")!;
+        tocEl.innerHTML = "";
+        const heads = [...articleEl.querySelectorAll("h1, h2, h3")];
+        if (heads.length === 0) {
+          tocPane.hidden = true;
+          return;
+        }
+        tocPane.hidden = false;
+        if (window.matchMedia("(min-width: 1100px)").matches) tocPane.open = true;
+        for (const h of heads) {
+          if (!h.id) continue;
+          const a = document.createElement("a");
+          a.href = "#" + h.id;
+          a.textContent = h.textContent || "";
+          a.className = "toc-" + h.tagName.toLowerCase();
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            h.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          tocEl.appendChild(a);
+        }
+      }
+
+      async function copyToClipboard(text: string): Promise<boolean> {
+        if (navigator.clipboard && window.isSecureContext) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch {}
+        }
+        try {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          const successful = document.execCommand("copy");
+          document.body.removeChild(textarea);
+          return successful;
+        } catch {
+          return false;
+        }
+      }
+
+      function attachCopyButtons() {
+        const pres = articleEl.querySelectorAll("pre");
+        pres.forEach((pre) => {
+          if (pre.parentElement?.classList.contains("code-block-wrapper")) return;
+
+          const wrapper = document.createElement("div");
+          wrapper.className = "code-block-wrapper";
+          pre.parentNode?.insertBefore(wrapper, pre);
+          wrapper.appendChild(pre);
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "copy-btn";
+          btn.setAttribute("aria-label", "Copy code");
+          btn.textContent = "copy";
+
+          btn.addEventListener("click", async () => {
+            const code = pre.querySelector("code");
+            const text = (code ? code.innerText : pre.innerText).replace(/\n$/, "");
+            const ok = await copyToClipboard(text);
+            if (ok) {
+              btn.textContent = "copied";
+              setTimeout(() => {
+                btn.textContent = "copy";
+              }, 2000);
+            } else {
+              btn.textContent = "failed";
+              setTimeout(() => {
+                btn.textContent = "copy";
+              }, 2000);
+            }
+          });
+
+          wrapper.appendChild(btn);
+        });
+      }
+
+      function showIndex() {
+        viewerEl.hidden = true;
+        indexEl.hidden = false;
+        tocPane.hidden = true;
+        history.replaceState(null, "", location.pathname + location.search);
+      }
+
+      backLink.addEventListener("click", showIndex);
+
+      document
+        .querySelectorAll<HTMLAnchorElement>("#index .machines a")
+        .forEach((a) => {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            openWriteup({
+              repo: a.dataset.repo!,
+              branch: a.dataset.branch!,
+              dir: a.dataset.dir!,
+              prefix: a.dataset.prefix ?? "",
+            });
+          });
+        });
+
+      // deep-link support: /writing#repo/prefix/Name
+      const hash = decodeURIComponent(location.hash.slice(1));
+      if (hash && hash.includes("/")) {
+        const [repoName, ...rest] = hash.split("/");
+        const dir = rest.pop()!;
+        const prefix = rest.length ? rest.join("/") + "/" : "";
+        const a = [
+          ...document.querySelectorAll<HTMLAnchorElement>("#index .machines a"),
+        ].find(
+          (el) =>
+            el.dataset.repo === repoName &&
+            el.dataset.dir === dir &&
+            (el.dataset.prefix ?? "") === prefix
+        );
+        if (a) {
+          openWriteup({ repo: repoName, branch: a.dataset.branch!, dir, prefix });
+        }
+      }
+    </script>
+  </div>
+</Base>

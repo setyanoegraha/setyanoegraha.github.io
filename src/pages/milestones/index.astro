@@ -1,0 +1,67 @@
+---
+import Base from "../../layouts/Base.astro";
+import { profile } from "../../data/profile";
+
+const sorted = [...profile.milestones].sort((a, b) => b.date.localeCompare(a.date));
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const years: { year: string; months: { key: string; label: string; items: typeof sorted }[] }[] = [];
+for (const m of sorted) {
+  const [y, mo] = m.date.split("-");
+  let year = years.at(-1);
+  if (!year || year.year !== y) {
+    year = { year: y, months: [] };
+    years.push(year);
+  }
+  const lastMonth = year.months.at(-1);
+  if (lastMonth && lastMonth.key === m.date) lastMonth.items.push(m);
+  else year.months.push({ key: m.date, label: MONTHS[Number(mo) - 1], items: [m] });
+}
+
+const platform = (url?: string) => {
+  if (!url) return "";
+  if (url.includes("vulnyx.com")) return "VulNyx";
+  if (url.includes("hackmyvm.eu")) return "HackMyVM";
+  if (url.includes("dockerlabs.es")) return "DockerLabs";
+  if (url.includes("github.com")) return "GitHub";
+  return "";
+};
+const tag = (m: (typeof sorted)[number]) => platform(m.url);
+const escapeHtml = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const linkify = (text: string) =>
+  escapeHtml(text).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+---
+<Base>
+  <h1>Milestones</h1>
+  <p>A record of what I've shipped and when, newest first.</p>
+  {sorted.length === 0 ? (
+    <p class="empty">Nothing here yet.</p>
+  ) : (
+    years.map(({ year, months }) => (
+      <>
+        <h2 class="year-head">{year}</h2>
+        {months.map(({ label, items }) => (
+          <>
+            <h3 class="group">{label}</h3>
+            <ul class="list">
+              {items.map((m) => (
+                <li>
+                  <div class="entry">
+                    <span class="entry-row">
+                      <span class="entry-name">
+                        {m.url ? <a href={m.url} target="_blank" rel="noopener">{m.title}</a> : m.title}
+                      </span>
+                      <span class="leader" aria-hidden="true"></span>
+                      <span class="entry-meta">{tag(m)}</span>
+                    </span>
+                    <span class="entry-desc" set:html={linkify(m.detail)} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))}
+      </>
+    ))
+  )}
+</Base>

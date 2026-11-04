@@ -1,70 +1,134 @@
 export interface Project {
-  name: string;
+  name: string; // display name, not the repo slug
   url: string;
-  description: string | null;
-  language: string | null;
-  stars: number | null;
+  description: string;
+  date: string; // "YYYY-MM", when the repo was created
 }
 
-export interface Achievement {
+export interface Milestone {
   title: string;
-  detail: string;
+  detail: string; // supports [text](url) rendered by /milestones
+  date: string; // "YYYY-MM"
   url?: string;
-}
-
-export interface StatusItem {
-  label: string;
-  value: string;
-}
-
-export interface Writing {
-  name: string;
-  url: string;
-  note: string;
 }
 
 export const profile = {
   name: "Nugraha",
-  status: [
-    { label: "Availability", value: "IT / security internship, 2026" },
-    { label: "Semester", value: "5th · Computer Engineering Technology, POLINES" },
-    { label: "Based", value: "Semarang, Indonesia" },
-    { label: "Currently", value: "hands-on security labs and lab-machine development" },
-  ] as StatusItem[],
   links: {
     github: "https://github.com/setyanoegraha",
     linkedin: "https://www.linkedin.com/in/setyanoegraha/",
     email: "pandu4688@gmail.com",
   },
   projects: [
-    { name: "ledger-tui", url: "https://github.com/setyanoegraha/ledger-tui", description: null, language: null, stars: null },
-    { name: "nyx-tui", url: "https://github.com/setyanoegraha/nyx-tui", description: null, language: null, stars: null },
-    { name: "hmv-tui", url: "https://github.com/setyanoegraha/hmv-tui", description: null, language: null, stars: null },
-    { name: "dl-tui", url: "https://github.com/setyanoegraha/dl-tui", description: null, language: null, stars: null },
-    { name: "webapp_osce", url: "https://github.com/setyanoegraha/webapp_osce", description: null, language: null, stars: null },
-    { name: "hackmyvm-commandlineinterface", url: "https://github.com/setyanoegraha/hackmyvm-commandlineinterface", description: null, language: null, stars: null },
-    { name: "revshell-tui", url: "https://github.com/setyanoegraha/revshell-tui", description: null, language: null, stars: null },
+    {
+      name: "Ledger",
+      url: "https://github.com/setyanoegraha/ledger-tui",
+      description: "Local bookkeeping for double-entry records, with charts and a SQLite store.",
+      date: "2026-11",
+    },
+    {
+      name: "Nyx Console",
+      url: "https://github.com/setyanoegraha/nyx-tui",
+      description: "Terminal dashboard for VulNyx: browse machines, track finished boxes and read writeups.",
+      date: "2026-09",
+    },
+    {
+      name: "HackMyVM Console",
+      url: "https://github.com/setyanoegraha/hmv-tui",
+      description: "Terminal dashboard for HackMyVM: machine catalog, downloads, flags and progress.",
+      date: "2026-09",
+    },
+    {
+      name: "DockerLabs Console",
+      url: "https://github.com/setyanoegraha/dl-tui",
+      description: "Terminal dashboard for DockerLabs: catalog, downloads and progress tracking.",
+      date: "2026-09",
+    },
+    {
+      name: "OSCE Assessor",
+      url: "https://github.com/setyanoegraha/webapp_osce",
+      description: "Web platform for clinical exam assessment, built for medical education staff.",
+      date: "2026-02",
+    },
+    {
+      name: "HMV CLI",
+      url: "https://github.com/setyanoegraha/hackmyvm-commandlineinterface",
+      description: "Command line tool to search HackMyVM machines, fetch them and submit flags.",
+      date: "2025-12",
+    },
+    {
+      name: "Shellcraft",
+      url: "https://github.com/setyanoegraha/revshell-tui",
+      description: "Offline reverse shell generator that runs entirely in the terminal.",
+      date: "2026-11",
+    },
   ] as Project[],
-  achievements: [
+  milestones: [
     {
-      title: "260+ hands-on security labs completed",
-      detail: "practical exercises across HackMyVM, DockerLabs and VulNyx platforms",
-      url: "https://github.com/setyanoegraha?tab=repositories",
+      title: "First HackMyVM walkthroughs published",
+      detail: "started documenting every machine I finish",
+      date: "2025-11",
+      url: "https://github.com/setyanoegraha/hackmyvm-writeups",
     },
     {
-      title: "Published vulnerable lab machines",
-      detail: "authored machines published on DockerLabs, HackMyVM and VulNyx",
-      url: "https://github.com/setyanoegraha?tab=repositories",
-    },
-    {
-      title: "Built own lab-progress toolkit",
-      detail: "CLI tooling for tracking lab work",
+      title: "Built HMV CLI",
+      detail: "command line tool for searching machines, fetching them and submitting flags",
+      date: "2025-12",
       url: "https://github.com/setyanoegraha/hackmyvm-commandlineinterface",
     },
-  ] as Achievement[],
-  writing: [
-    { name: "hackmyvm-writeups", url: "https://github.com/setyanoegraha/hackmyvm-writeups", note: "HackMyVM walkthroughs" },
-    { name: "vulnyx-writeups", url: "https://github.com/setyanoegraha/vulnyx-writeups", note: "VulNyx walkthroughs" },
-    { name: "dockerlabs-writeups", url: "https://github.com/setyanoegraha/dockerlabs-writeups", note: "DockerLabs walkthroughs" },
-  ] as Writing[],
+    {
+      title: "Released OSCE Assessor",
+      detail: "web platform for clinical exam assessment used by medical education staff",
+      date: "2026-02",
+      url: "https://github.com/setyanoegraha/webapp_osce",
+    },
+    {
+      title: "Added DockerLabs writeups",
+      detail: "expanded the collection to DockerLabs walkthroughs.",
+      date: "2026-03",
+      url: "https://github.com/setyanoegraha/dockerlabs-writeups",
+    },
+    {
+      title: "Added VulNyx writeups",
+      detail: "brought the collection to VulNyx, with 39 walkthroughs in the first month.",
+      date: "2026-08",
+      url: "https://github.com/setyanoegraha/vulnyx-writeups",
+    },
+    {
+      title: "Released three terminal dashboards",
+      detail: "[HackMyVM Console](https://github.com/setyanoegraha/hmv-tui), [DockerLabs Console](https://github.com/setyanoegraha/dl-tui) and [Nyx Console](https://github.com/setyanoegraha/nyx-tui), all shipped in the same month.",
+      date: "2026-09",
+      url: "https://github.com/setyanoegraha/hmv-tui",
+    },
+    {
+      title: "Published Groups on VulNyx",
+      detail: "Medium-difficulty Linux machine with a redos and disk-group path",
+      date: "2026-09",
+      url: "https://vulnyx.com/",
+    },
+    {
+      title: "Published Ledger on HackMyVM",
+      detail: "accounting app with a CSV upload path to code execution",
+      date: "2026-10",
+      url: "https://hackmyvm.eu/",
+    },
+    {
+      title: "Published Grenade on HackMyVM",
+      detail: "WordPress box with an unauthenticated plugin vulnerability",
+      date: "2026-10",
+      url: "https://hackmyvm.eu/",
+    },
+    {
+      title: "Published Hannah Coffee on DockerLabs",
+      detail: "chained file inclusion and log poisoning up to root",
+      date: "2026-08",
+      url: "https://dockerlabs.es/",
+    },
+    {
+      title: "Released Ledger and Shellcraft",
+      detail: "[Ledger](https://github.com/setyanoegraha/ledger-tui), a SQLite bookkeeping app, and [Shellcraft](https://github.com/setyanoegraha/revshell-tui), an offline reverse shell generator.",
+      date: "2026-11",
+      url: "https://github.com/setyanoegraha/ledger-tui",
+    },
+  ] as Milestone[],
 };
