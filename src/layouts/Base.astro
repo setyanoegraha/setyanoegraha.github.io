@@ -1,7 +1,13 @@
 ---
-const fullTitle = "setyanoegraha";
-const description =
-  "Nugraha, computer engineering student at Semarang State Polytechnic. IT and security internship candidate. Projects, labs and writeups.";
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = "Nugraha, computer engineering student at Semarang State Polytechnic. IT and security internship candidate. Projects, labs and writeups."
+} = Astro.props;
 
 const nav = [
   { label: "Projects", href: "/projects" },
@@ -9,6 +15,17 @@ const nav = [
   { label: "Writing", href: "/writing" },
 ];
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+
+const pageTitleMap: Record<string, string> = {
+  "/": "setyanoegraha · Nugraha",
+  "/projects": "Projects · setyanoegraha",
+  "/milestones": "Milestones · setyanoegraha",
+  "/writing": "Writing & Lab Walkthroughs · setyanoegraha",
+  "/writing/vulnyx": "VulNyx Walkthroughs · setyanoegraha",
+  "/writing/hackmyvm": "HackMyVM Walkthroughs · setyanoegraha",
+  "/writing/dockerlabs": "DockerLabs Walkthroughs · setyanoegraha",
+};
+const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
 ---
 <!doctype html>
 <html lang="en">
@@ -20,6 +37,8 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
     <meta name="referrer" content="no-referrer" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github.com https://raw.githubusercontent.com; connect-src 'self' https://raw.githubusercontent.com https://api.github.com; font-src 'self' data:; object-src 'none'; base-uri 'self';" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="setyanoegraha" />
     <meta property="og:title" content={fullTitle} />
@@ -32,6 +51,37 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
     <meta name="twitter:image" content="https://github.com/setyanoegraha.png" />
     <link rel="canonical" href={Astro.url} />
     <title>{fullTitle}</title>
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://setyanoegraha.com/#person",
+          "name": "Nugraha",
+          "alternateName": ["setyanoegraha", "Setyo Nugraha", "Pandu Nugraha"],
+          "url": "https://setyanoegraha.com",
+          "image": "https://github.com/setyanoegraha.png",
+          "sameAs": [
+            "https://github.com/setyanoegraha",
+            "https://www.linkedin.com/in/setyanoegraha/"
+          ],
+          "jobTitle": "Security Researcher & Computer Engineering Student",
+          "alumniOf": {
+            "@type": "EducationalOrganization",
+            "name": "Semarang State Polytechnic",
+            "url": "https://polines.ac.id/id"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://setyanoegraha.com/#website",
+          "url": "https://setyanoegraha.com",
+          "name": "setyanoegraha",
+          "description": description,
+          "publisher": { "@id": "https://setyanoegraha.com/#person" }
+        }
+      ]
+    })} />
     <script is:inline>
       (function () {
         var saved = localStorage.getItem("theme");
