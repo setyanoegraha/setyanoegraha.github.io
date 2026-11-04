@@ -354,7 +354,34 @@ if (repos.length === 0) {
       }
 
       function rawUrl(m: MachineLink, file: string): string {
-        return `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/${file}`;
+        const encPrefix = m.prefix ? m.prefix.split("/").map(encodeURIComponent).join("/") : "";
+        const encDir = encodeURIComponent(m.dir);
+        const encFile = encodeURIComponent(file);
+        return `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${encPrefix}${encDir}/${encFile}`;
+      }
+
+      const ANOMALIES: Record<string, string> = {
+        pingme: "PingMe.md",
+        vivifytech: "vivifyTech.md",
+      };
+
+      function getCandidates(d: string): string[] {
+        const cap = d.length ? d[0].toUpperCase() + d.slice(1) : d;
+        const decap = d.length ? d[0].toLowerCase() + d.slice(1) : d;
+        const titleWords = d
+          .split("-")
+          .map((w) => (w.length ? w[0].toUpperCase() + w.slice(1) : w))
+          .join("-");
+        const list = [
+          `${d}.md`,
+          `${d.toLowerCase()}.md`,
+          `${cap}.md`,
+          `${decap}.md`,
+          `${titleWords}.md`,
+          "README.md",
+        ];
+        if (ANOMALIES[d]) list.unshift(ANOMALIES[d]);
+        return [...new Set(list)];
       }
 
       async function openWriteup(m: MachineLink) {
@@ -364,7 +391,7 @@ if (repos.length === 0) {
         window.scrollTo({ top: 0 });
 
         let md: string | null = null;
-        for (const file of [`${m.dir}.md`, `${m.dir.toLowerCase()}.md`, "README.md"]) {
+        for (const file of getCandidates(m.dir)) {
           try {
             const r = await fetch(rawUrl(m, file));
             if (r.ok) {
