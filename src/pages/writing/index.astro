@@ -1,17 +1,10 @@
 ---
 import Base from "../../layouts/Base.astro";
-// snapshot refreshed manually; run the build with GITHUB_TOKEN to update
 import writeupsFallback from "../../data/writeups.json";
+import { posts } from "../../data/posts";
+import { featuredWalkthroughs } from "../../data/profile";
 
 const GITHUB_USER = "setyanoegraha";
-
-const repoLabel = (name: string) =>
-  name
-    .replace(/-writeups$/, " walkthroughs")
-    .replace(/^hackmyvm/, "HackMyVM")
-    .replace(/^dockerlabs/, "DockerLabs")
-    .replace(/^vulnyx/, "VulNyx")
-    .replace(/^./, (c) => c.toUpperCase());
 
 interface Repo {
   name: string;
@@ -101,12 +94,17 @@ try {
   error = e instanceof Error ? e.message : String(e);
 }
 
-let source: "api" | "snapshot" = "api";
 if (repos.length === 0) {
   repos = writeupsFallback as IndexedRepo[];
-  source = "snapshot";
   error = null;
 }
+
+// Branch lookup for featured walkthroughs
+const branchMap = Object.fromEntries(repos.map((r) => [r.name, r.branch ?? "main"]));
+
+const vRepo = repos.find((r) => r.name === "vulnyx-writeups");
+const hRepo = repos.find((r) => r.name === "hackmyvm-writeups");
+const dRepo = repos.find((r) => r.name === "dockerlabs-writeups");
 ---
 <Base>
   <div id="writing-root">
@@ -118,78 +116,148 @@ if (repos.length === 0) {
       </details>
       <article id="article"></article>
     </div>
+
     <div id="index">
       <h1>Writing</h1>
-      <p>Every machine I finish gets a walkthrough. Pick one and read it here. Hopefully you learn something new.</p>
-      {error ? (
-        <p class="empty">
-          Walkthrough files are on GitHub for now.{" "}
-          {SHOWCASED_WRITEUPS.map((name, i) => (
-            <>
-              {i > 0 && " · "}
-              <a href={`https://github.com/${GITHUB_USER}/${name}`} target="_blank" rel="noopener">{name}</a>
-            </>
+      <p>Essays, personal notes, and step-by-step exploitation walkthroughs from the labs I've rooted.</p>
+
+      {/* Section A: Notes & Essays */}
+      <section class="writing-section" id="notes-section">
+        <h2 class="section-head">Notes &amp; Essays</h2>
+        {posts.length === 0 ? (
+          <div class="empty-notes">
+            <p>Notes and essays are currently in preparation. Lab walkthroughs are available below.</p>
+          </div>
+        ) : (
+          <ul class="list post-list">
+            {posts.map((post) => (
+              <li>
+                {post.externalUrl ? (
+                  <a class="entry post-entry" href={post.externalUrl} target="_blank" rel="noopener">
+                    <span class="entry-row">
+                      <span class="entry-name">{post.title}</span>
+                      <span class="leader" aria-hidden="true"></span>
+                      <span class="entry-meta">{post.category} · {post.date}</span>
+                    </span>
+                    <span class="entry-desc">{post.summary}</span>
+                  </a>
+                ) : (
+                  <a class="entry post-entry" href={`/writing/${post.slug}`}>
+                    <span class="entry-row">
+                      <span class="entry-name">{post.title}</span>
+                      <span class="leader" aria-hidden="true"></span>
+                      <span class="entry-meta">{post.category} · {post.date}</span>
+                    </span>
+                    <span class="entry-desc">{post.summary}</span>
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* Section B: Featured Walkthroughs */}
+      <section class="writing-section" id="featured-section">
+        <h2 class="section-head">Featured Walkthroughs</h2>
+        <p class="section-note">Walkthroughs for vulnerable machines I designed and published for the community across VulNyx, HackMyVM, and DockerLabs.</p>
+        <ul class="list featured-list">
+          {featuredWalkthroughs.map((fw) => (
+            <li>
+              <a
+                class="entry featured-entry"
+                href={`#${fw.repo}/${fw.prefix}${fw.name}`}
+                data-repo={fw.repo}
+                data-branch={branchMap[fw.repo] ?? "main"}
+                data-dir={fw.name}
+                data-prefix={fw.prefix}
+              >
+                <span class="entry-row">
+                  <span class="entry-name">{fw.name}</span>
+                  <span class="leader" aria-hidden="true"></span>
+                  <span class="entry-meta platform-badge">{fw.platform}</span>
+                </span>
+                <span class="entry-desc">{fw.summary}</span>
+              </a>
+            </li>
           ))}
+        </ul>
+      </section>
+
+      {/* Section C: Walkthrough Archive (Narrative) */}
+      <section class="writing-section" id="archive-section">
+        <h2 class="section-head">Walkthroughs</h2>
+        <p class="lede">
+          I've documented {vRepo?.machines.length ?? 57} boxes on VulNyx, working through techniques ranging from multi-stage web exploitation to disk-group and capability-based privilege escalation.{" "}
+          <a class="ep" href="/writing/vulnyx">Read all VulNyx walkthroughs</a>
         </p>
-      ) : (
-        <>
-          {repos.map((repo) => (
-            <section class="repo">
-              <div class="entry-row repo-head">
-                <span class="entry-name">{repoLabel(repo.name)}</span>
-                <span class="leader" aria-hidden="true"></span>
-                <span class="entry-meta">{repo.machines.length} machines</span>
-              </div>
-              {repo.machines.length === 0 ? (
-                <p class="empty">No machines indexed yet.</p>
-              ) : (
-                <div class="machines">
-                  {repo.machines.map((m) => (
-                    <a
-                      href={`#${repo.name}/${repo.prefix}${m}`}
-                      data-repo={repo.name}
-                      data-branch={repo.branch}
-                      data-dir={m}
-                      data-prefix={repo.prefix}
-                    >{m}</a>
-                  ))}
-                </div>
-              )}
-            </section>
-          ))}
-        </>
-      )}
+        <p class="lede">
+          The HackMyVM collection is the largest at {hRepo?.machines.length ?? 172} entries, covering everything from WordPress plugin CVEs through kernel-level techniques and custom binary exploitation.{" "}
+          <a class="ep" href="/writing/hackmyvm">Read all HackMyVM walkthroughs</a>
+        </p>
+        <p class="lede">
+          DockerLabs walkthroughs cover {dRepo?.machines.length ?? 75} Linux containers, tracing attack chains through local file inclusion, JWT token manipulation, and lateral movement between services.{" "}
+          <a class="ep" href="/writing/dockerlabs">Read all DockerLabs walkthroughs</a>
+        </p>
+      </section>
     </div>
 
     <style>
+      :global(#writing-root h2.section-head) {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 2.5rem 0 1rem;
+        letter-spacing: -0.01em;
+      }
+      :global(#writing-root .writing-section:first-of-type h2.section-head) {
+        margin-top: 1.5rem;
+      }
+      :global(#writing-root .section-note) {
+        color: var(--dim);
+        font-size: 15px;
+        margin: -0.5rem 0 1rem;
+      }
+      :global(#writing-root .empty-notes) {
+        color: var(--dim);
+        font-size: 15px;
+        padding: 0.75rem 0;
+      }
+      :global(#writing-root .post-entry),
+      :global(#writing-root .featured-entry) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        text-decoration: none;
+        color: var(--fg);
+        padding: 0.5rem 0;
+      }
+      :global(#writing-root .post-entry:hover .entry-name),
+      :global(#writing-root .featured-entry:hover .entry-name) {
+        color: var(--accent);
+      }
+      :global(#writing-root .post-list),
+      :global(#writing-root .featured-list) {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      :global(#writing-root .post-list li),
+      :global(#writing-root .featured-list li) {
+        border-bottom: 1px solid var(--border);
+      }
+      :global(#writing-root .post-list li:last-child),
+      :global(#writing-root .featured-list li:last-child) {
+        border-bottom: none;
+      }
+      :global(#writing-root .platform-badge) {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--accent);
+      }
       :global(#writing-root .entry-meta) {
         font-family: var(--mono);
         font-size: 12px;
         color: var(--dim);
-      }
-      :global(#writing-root .repo-head) { margin: 0 0 0.6rem; }
-      :global(#writing-root .repo) { margin-bottom: 2rem; }
-      :global(#writing-root .repo h2) {
-        font-size: 1.15rem;
-        margin: 0 0 0.5rem;
-      }
-      :global(#writing-root .machines) {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-        gap: 0.15rem 1.2rem;
-        font-size: 15.5px;
-        content-visibility: auto;
-        contain-intrinsic-size: 0 20rem;
-      }
-      :global(#writing-root .machines a) {
-        font-family: var(--sans);
-        font-size: 15.5px;
-        color: var(--fg);
-        text-decoration: none;
-      }
-      :global(#writing-root .machines a:hover) {
-        color: var(--accent);
-        text-decoration: underline;
       }
       :global(#writing-root #back-link) {
         background: none;
@@ -426,8 +494,6 @@ if (repos.length === 0) {
                   !/^(https?:|data:|#|\/\/)/.test(token.href)
                 ) {
                   const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${m.repo}/${m.branch}/${m.prefix}${m.dir}/`;
-                  // resolve relative to the machine dir; legacy refs like "machines/X/image.png" or
-                  // "../agent/images/img.png" from pre-normalization writeups are stripped/joined safely
                   let rel = token.href.replace(/^\.\//, "");
                   rel = rel.replace(/^machines\/[^/]+\//, "");
                   token.href = base + rel.split("/").map(encodeURIComponent).join("/");
@@ -522,14 +588,10 @@ if (repos.length === 0) {
             const ok = await copyToClipboard(text);
             if (ok) {
               btn.textContent = "copied";
-              setTimeout(() => {
-                btn.textContent = "copy";
-              }, 2000);
+              setTimeout(() => { btn.textContent = "copy"; }, 2000);
             } else {
               btn.textContent = "failed";
-              setTimeout(() => {
-                btn.textContent = "copy";
-              }, 2000);
+              setTimeout(() => { btn.textContent = "copy"; }, 2000);
             }
           });
 
@@ -546,28 +608,32 @@ if (repos.length === 0) {
 
       backLink.addEventListener("click", showIndex);
 
-      document
-        .querySelectorAll<HTMLAnchorElement>("#index .machines a")
-        .forEach((a) => {
-          a.addEventListener("click", (e) => {
-            e.preventDefault();
-            openWriteup({
-              repo: a.dataset.repo!,
-              branch: a.dataset.branch!,
-              dir: a.dataset.dir!,
-              prefix: a.dataset.prefix ?? "",
+      // Wire up featured machine links
+      function wireFeaturedLinks() {
+        document
+          .querySelectorAll<HTMLAnchorElement>("#index .featured-entry")
+          .forEach((a) => {
+            a.addEventListener("click", (e) => {
+              e.preventDefault();
+              openWriteup({
+                repo: a.dataset.repo!,
+                branch: a.dataset.branch!,
+                dir: a.dataset.dir!,
+                prefix: a.dataset.prefix ?? "",
+              });
             });
           });
-        });
+      }
+      wireFeaturedLinks();
 
-      // deep-link support: /writing#repo/prefix/Name
+      // Deep-link support: /writing#repo/prefix/Name
       const hash = decodeURIComponent(location.hash.slice(1));
       if (hash && hash.includes("/")) {
         const [repoName, ...rest] = hash.split("/");
         const dir = rest.pop()!;
         const prefix = rest.length ? rest.join("/") + "/" : "";
         const a = [
-          ...document.querySelectorAll<HTMLAnchorElement>("#index .machines a"),
+          ...document.querySelectorAll<HTMLAnchorElement>("#index .featured-entry"),
         ].find(
           (el) =>
             el.dataset.repo === repoName &&

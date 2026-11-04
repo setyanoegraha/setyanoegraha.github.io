@@ -1,0 +1,109 @@
+---
+import Base from "../../layouts/Base.astro";
+import { posts, type Post } from "../../data/posts";
+
+export async function getStaticPaths() {
+  if (posts.length === 0) {
+    // Keep build passing cleanly when zero posts exist
+    return [
+      {
+        params: { slug: "sample-note" },
+        props: {
+          isPlaceholder: true,
+          post: {
+            title: "Sample Note",
+            date: "2026-11-04",
+            summary: "Placeholder note.",
+            category: "Note",
+            slug: "sample-note",
+            content: "This is a placeholder note.",
+          } as Post,
+        },
+      },
+    ];
+  }
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { isPlaceholder: false, post },
+  }));
+}
+
+interface Props {
+  isPlaceholder: boolean;
+  post: Post;
+}
+
+const { isPlaceholder, post } = Astro.props;
+---
+<Base>
+  {isPlaceholder ? (
+    <article class="post-single">
+      <h1>Note in preparation</h1>
+      <p class="empty">This note is currently in preparation. <a href="/writing">Return to writing</a>.</p>
+    </article>
+  ) : (
+    <article class="post-single">
+      <header class="post-header">
+        <div class="post-meta-row">
+          <span class="category-badge">{post.category}</span>
+          <time class="post-date">{post.date}</time>
+        </div>
+        <h1>{post.title}</h1>
+        {post.summary && <p class="post-lead">{post.summary}</p>}
+      </header>
+      <div class="post-content" set:html={post.content || ""} />
+      <footer class="post-footer">
+        <a href="/writing">← Back to writing</a>
+      </footer>
+    </article>
+  )}
+
+  <style>
+    .post-single {
+      margin-top: 1rem;
+    }
+    .post-header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .post-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .category-badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+    }
+    .post-date {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+    }
+    .post-lead {
+      font-size: 18px;
+      color: var(--dim);
+      margin-top: 0.5rem;
+    }
+    .post-content {
+      font-size: 17.5px;
+      line-height: 1.75;
+    }
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--sans);
+      font-size: 14px;
+    }
+  </style>
+</Base>

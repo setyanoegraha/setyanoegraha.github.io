@@ -1,50 +1,15 @@
 ---
 import Base from "../layouts/Base.astro";
+import { profile } from "../data/profile";
 ---
 <Base>
   <p class="lede">
-    Hi, I'm <strong>Nugraha</strong>. I spend most of my time inside Linux
-    terminals, taking systems apart to understand how they break and how to
-    secure them.
+    Hi, I'm <strong>Nugraha</strong>, a Computer Engineering Technology student based in Semarang. Most of my days are spent inside Linux terminals, figuring out how systems break and how to lock them down.
   </p>
   <p class="lede">
-    Over the past year, I've worked through more than 260 hands-on labs across
-    HackMyVM, DockerLabs, and VulNyx. After spending enough hours breaking into
-    machines built by others, I started designing and publishing vulnerable
-    machines of my own for the community to practice on. Four of them are live
-    now: Groups on VulNyx, Ledger and Grenade on HackMyVM, and Hannah Coffee on
-    DockerLabs.
+    After solving hundreds of labs on HackMyVM, DockerLabs, and VulNyx, I started building vulnerable machines of my own. Four are live now: Groups, Ledger, Grenade, and Hannah Coffee. Whenever a manual task gets repetitive, I write small, self-contained <a class="ep" href="/projects">projects</a> like Shellcraft and platform consoles to automate it. I also share notes, essays, and 300+ full lab walkthroughs under <a class="ep" href="/writing">writing</a>, alongside a complete shipping log on <a class="ep" href="/milestones">milestones</a>.
   </p>
   <p class="lede">
-    The tools I build along the way are small and self-contained, usually because
-    I got tired of repeating the same steps by hand. Shellcraft, Ledger, and the
-    three platform consoles are all on{" "}
-    <a class="ep" href="/projects">the projects page</a>,
-    newest first.
-  </p>
-  <p class="lede">
-    I keep a record of what shipped and when, both software and lab machines,
-    on{" "}
-    <a class="ep" href="/milestones">the milestones page</a>.
-    Each entry links back to the repository or platform that produced it.
-  </p>
-  <p class="lede">
-    Whenever I finish an interesting box, I write the full walkthrough and host it
-    here. All 304 of them are readable on{" "}
-    <a class="ep" href="/writing">the writing page</a>,
-    without an account or a download.
-  </p>
-  <p class="lede">
-    I'm based in Semarang and currently in my fifth semester of Computer
-    Engineering Technology at <a href="https://polines.ac.id/id" target="_blank" rel="noopener">Semarang State Polytechnic</a>. For 2026, I'm looking for an IT or security
-    internship where I can work on real systems and learn from experienced
-    engineers.
-  </p>
-  <p class="lede">
-    If any of that is useful, reach me by{" "}
-    <a href="mailto:pandu4688@gmail.com">email</a>,{" "}
-    <a href="https://github.com/setyanoegraha" target="_blank" rel="noopener">GitHub</a>,
-    or{" "}
-    <a href="https://www.linkedin.com/in/setyanoegraha/" target="_blank" rel="noopener">LinkedIn</a>.
+    I'm currently in my fifth semester at <a href="https://polines.ac.id/id" target="_blank" rel="noopener">Semarang State Polytechnic</a> and open to 2026 internships in cybersecurity or IT engineering. Feel free to connect via <a href={`mailto:${profile.links.email}`}>Email</a>, <a href={profile.links.github} target="_blank" rel="noopener">GitHub</a>, or <a href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>.
   </p>
 </Base>

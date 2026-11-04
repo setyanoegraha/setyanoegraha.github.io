@@ -277,7 +277,7 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
         <a class="brand" href="/">Nugraha</a>
         <nav class="nav">
           {nav.map((item) => (
-            <a href={item.href} aria-current={path === item.href ? "page" : undefined}>{item.label}</a>
+            <a href={item.href} aria-current={(item.href === "/" ? path === "/" : path.startsWith(item.href)) ? "page" : undefined}>{item.label}</a>
           ))}
           <button id="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false">dark</button>
         </nav>
