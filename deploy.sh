@@ -25,4 +25,4 @@ git add -A
 git commit -m "deploy: $(date '+%Y-%m-%d %H:%M WIB')" --allow-empty
 git push origin gh-pages
 git checkout source
-echo "deployed → https://setyanoegraha.github.io (gh-pages branch)"
+echo "deployed → https://setyanoegraha.com (gh-pages branch)"

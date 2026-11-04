@@ -1,8 +1,6 @@
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://setyanoegraha.github.io",
+  site: "https://setyanoegraha.com",
   base: "/",
-  server: { host: true },
-  preview: { host: true },
 });
