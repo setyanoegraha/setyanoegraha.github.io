@@ -160,7 +160,7 @@ const dRepo = repos.find((r) => r.name === "dockerlabs-writeups");
       {/* Section B: Featured Walkthroughs */}
       <section class="writing-section" id="featured-section">
         <h2 class="section-head">Featured Walkthroughs</h2>
-        <p class="section-note">Walkthroughs for vulnerable machines I designed and published for the community across VulNyx, HackMyVM, and DockerLabs.</p>
+        <p class="section-note">Vulnerable machines I designed, published, and documented for the community across VulNyx, HackMyVM, and DockerLabs.</p>
         <ul class="list featured-list">
           {featuredWalkthroughs.map((fw) => (
             <li>
@@ -184,20 +184,11 @@ const dRepo = repos.find((r) => r.name === "dockerlabs-writeups");
         </ul>
       </section>
 
-      {/* Section C: Walkthrough Archive (Narrative) */}
+      {/* Section C: Walkthrough Archive */}
       <section class="writing-section" id="archive-section">
         <h2 class="section-head">Walkthroughs</h2>
         <p class="lede">
-          I've documented {vRepo?.machines.length ?? 57} boxes on VulNyx, working through techniques ranging from multi-stage web exploitation to disk-group and capability-based privilege escalation.{" "}
-          <a class="ep" href="/writing/vulnyx">Read all VulNyx walkthroughs</a>
-        </p>
-        <p class="lede">
-          The HackMyVM collection is the largest at {hRepo?.machines.length ?? 172} entries, covering everything from WordPress plugin CVEs through kernel-level techniques and custom binary exploitation.{" "}
-          <a class="ep" href="/writing/hackmyvm">Read all HackMyVM walkthroughs</a>
-        </p>
-        <p class="lede">
-          DockerLabs walkthroughs cover {dRepo?.machines.length ?? 75} Linux containers, tracing attack chains through local file inclusion, JWT token manipulation, and lateral movement between services.{" "}
-          <a class="ep" href="/writing/dockerlabs">Read all DockerLabs walkthroughs</a>
+          Writing down how a system breaks is the best way to understand how it works. I keep step-by-step compromise notes across <a class="ep" href="/writing/hackmyvm">{hRepo?.machines.length ?? 172} HackMyVM boxes</a>, <a class="ep" href="/writing/dockerlabs">{dRepo?.machines.length ?? 75} DockerLabs containers</a>, and <a class="ep" href="/writing/vulnyx">{vRepo?.machines.length ?? 57} VulNyx machines</a>, documenting everything from initial enumeration to root.
         </p>
       </section>
     </div>
@@ -242,8 +233,8 @@ const dRepo = repos.find((r) => r.name === "dockerlabs-writeups");
         margin: 0;
       }
       :global(#writing-root .post-list li),
-      :global(#writing-root .featured-list li) {
-        border-bottom: 1px solid var(--border);
+      :global(#writing-root .featured-list li){
+        border-bottom: none;
       }
       :global(#writing-root .post-list li:last-child),
       :global(#writing-root .featured-list li:last-child) {

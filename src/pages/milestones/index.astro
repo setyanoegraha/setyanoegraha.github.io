@@ -52,7 +52,6 @@ const linkify = (text: string) =>
                         {m.url ? <a href={m.url} target="_blank" rel="noopener">{m.title}</a> : m.title}
                       </span>
                       <span class="leader" aria-hidden="true"></span>
-                      <span class="entry-meta">{tag(m)}</span>
                     </span>
                     <span class="entry-desc" set:html={linkify(m.detail)} />
                   </div>

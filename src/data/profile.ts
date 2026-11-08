@@ -59,6 +59,12 @@ export const profile = {
       date: "2026-09",
     },
     {
+      name: "CareKicks",
+      url: "https://github.com/setyanoegraha/CareKicks-FE",
+      description: "Shoe laundry marketplace featuring a Flutter mobile app for customers, a web onboarding portal for vendors, and a REST API.",
+      date: "2026-07",
+    },
+    {
       name: "OSCE Assessor",
       url: "https://github.com/setyanoegraha/webapp_osce",
       description: "Web platform built for medical education staff to manage clinical exam assessments.",
@@ -76,12 +82,6 @@ export const profile = {
       title: "Released Ledger and Shellcraft",
       detail: "Shipped [Ledger](https://github.com/setyanoegraha/ledger-tui) and [Shellcraft](https://github.com/setyanoegraha/revshell-tui): a SQLite double-entry bookkeeping app and an offline reverse shell generator.",
       date: "2026-11",
-    },
-    {
-      title: "Published Hannah Coffee on DockerLabs",
-      detail: "Linux target chaining local file inclusion and log poisoning to gain root.",
-      date: "2026-11",
-      url: "https://dockerlabs.es/",
     },
     {
       title: "Published Ledger on HackMyVM",
@@ -111,6 +111,17 @@ export const profile = {
       detail: "Published an initial batch of 39 VulNyx walkthroughs in a single month.",
       date: "2026-08",
       url: "https://github.com/setyanoegraha/vulnyx-writeups",
+    },
+    {
+      title: "Built CareKicks Marketplace",
+      detail: "Developed a shoe laundry marketplace with a [Flutter customer app](https://github.com/setyanoegraha/CareKicks-FE), a [vendor registration portal](https://github.com/setynoegraha/CareKicks-Web), and a [backend API](https://github.com/setyaneograha/CareKicks-BE).",
+      date: "2026-07",
+    },
+    {
+      title: "Published Hannah Coffee on DockerLabs",
+      detail: "Linux target chaining local file inclusion and log poisoning to gain root.",
+      date: "2026-08",
+      url: "https://dockerlabs.es/",
     },
     {
       title: "Added DockerLabs writeups",
