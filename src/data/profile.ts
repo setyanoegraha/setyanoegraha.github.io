@@ -10,6 +10,7 @@ export interface Milestone {
   detail: string; // supports [text](url) rendered by /milestones
   date: string; // "YYYY-MM"
   url?: string;
+  platform?: "VulNyx" | "HackMyVM" | "DockerLabs" | "GitHub";
 }
 
 export interface FeaturedWalkthrough {
@@ -79,73 +80,53 @@ export const profile = {
   ] as Project[],
   milestones: [
     {
-      title: "Released Ledger and Shellcraft",
-      detail: "Shipped [Ledger](https://github.com/setyanoegraha/ledger-tui) and [Shellcraft](https://github.com/setyanoegraha/revshell-tui): a SQLite double-entry bookkeeping app and an offline reverse shell generator.",
-      date: "2026-11",
-    },
-    {
       title: "Published Ledger on HackMyVM",
       detail: "Vulnerable accounting web app featuring a CSV upload path to remote code execution.",
       date: "2026-10",
-      url: "https://hackmyvm.eu/",
+      url: "https://mega.nz/file/GoNACBLb#sop2lHrgbCcQ9EDUR7CnnXDmR9dT-WJ-fW09LrHVNkk",
+      platform: "HackMyVM",
     },
     {
       title: "Published Grenade on HackMyVM",
       detail: "WordPress target centered around an unauthenticated plugin vulnerability.",
       date: "2026-10",
-      url: "https://hackmyvm.eu/",
-    },
-    {
-      title: "Released three terminal dashboards",
-      detail: "Shipped [HackMyVM Console](https://github.com/setyanoegraha/hmv-tui), [DockerLabs Console](https://github.com/setyanoegraha/dl-tui) and [Nyx Console](https://github.com/setyanoegraha/nyx-tui) in the same month.",
-      date: "2026-09",
+      url: "https://mega.nz/file/S8VlnTCD#8XTl0EhUr8T_KXboLueBto1yeunPIynR0RH5sQGaz9U",
+      platform: "HackMyVM",
     },
     {
       title: "Published Groups on VulNyx",
       detail: "Medium-difficulty Linux machine chaining ReDoS with disk-group privilege escalation.",
       date: "2026-09",
-      url: "https://vulnyx.com/",
+      url: "https://drive.proton.me/urls/7QBFCDNHBR#3F47dtm2zEzR",
+      platform: "VulNyx",
     },
     {
       title: "Added VulNyx writeups",
       detail: "Published an initial batch of 39 VulNyx walkthroughs in a single month.",
       date: "2026-08",
       url: "https://github.com/setyanoegraha/vulnyx-writeups",
-    },
-    {
-      title: "Built CareKicks Marketplace",
-      detail: "Developed a shoe laundry marketplace with a [Flutter customer app](https://github.com/setyanoegraha/CareKicks-FE), a [vendor registration portal](https://github.com/setynoegraha/CareKicks-Web), and a [backend API](https://github.com/setyaneograha/CareKicks-BE).",
-      date: "2026-07",
+      platform: "VulNyx",
     },
     {
       title: "Published Hannah Coffee on DockerLabs",
       detail: "Linux target chaining local file inclusion and log poisoning to gain root.",
       date: "2026-08",
-      url: "https://dockerlabs.es/",
+      url: "https://gestion-maquinas.dockerlabs.es/dl/hannah_coffee.zip",
+      platform: "DockerLabs",
     },
     {
       title: "Added DockerLabs writeups",
       detail: "Started documenting exploitation notes for DockerLabs containers.",
       date: "2026-03",
       url: "https://github.com/setyanoegraha/dockerlabs-writeups",
-    },
-    {
-      title: "Released OSCE Assessor",
-      detail: "Deployed a clinical exam assessment web platform for medical education staff.",
-      date: "2026-02",
-      url: "https://github.com/setyanoegraha/webapp_osce",
-    },
-    {
-      title: "Built HMV CLI",
-      detail: "Created a terminal client for searching HackMyVM machines, fetching files, and submitting flags.",
-      date: "2025-12",
-      url: "https://github.com/setyanoegraha/hackmyvm-commandlineinterface",
+      platform: "DockerLabs",
     },
     {
       title: "First HackMyVM walkthroughs published",
       detail: "Began writing public documentation for every machine I root.",
       date: "2025-11",
       url: "https://github.com/setyanoegraha/hackmyvm-writeups",
+      platform: "HackMyVM",
     },
   ] as Milestone[],
 };

@@ -33,7 +33,7 @@ const linkify = (text: string) =>
 ---
 <Base>
   <h1>Milestones</h1>
-  <p>A timeline of vulnerable machines, tools, and projects I've shipped.</p>
+  <p>A timeline of vulnerable machines and security milestones I've shipped.</p>
   {sorted.length === 0 ? (
     <p class="empty">Nothing here yet.</p>
   ) : (
@@ -52,6 +52,9 @@ const linkify = (text: string) =>
                         {m.url ? <a href={m.url} target="_blank" rel="noopener">{m.title}</a> : m.title}
                       </span>
                       <span class="leader" aria-hidden="true"></span>
+                      {(m.platform || tag(m)) && (
+                        <span class="entry-meta platform-badge">{m.platform || tag(m)}</span>
+                      )}
                     </span>
                     <span class="entry-desc" set:html={linkify(m.detail)} />
                   </div>
@@ -64,3 +67,11 @@ const linkify = (text: string) =>
     ))
   )}
 </Base>
+
+<style>
+  .platform-badge {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--accent);
+  }
+</style>

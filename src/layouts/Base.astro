@@ -82,15 +82,6 @@ const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
         }
       ]
     })} />
-    <script is:inline>
-      (function () {
-        var saved = localStorage.getItem("theme");
-        var theme = saved === "dark" || saved === "light"
-          ? saved
-          : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-        document.documentElement.setAttribute("data-theme", theme);
-      })();
-    </script>
     <style is:global>
       :root {
         color-scheme: light;
@@ -108,22 +99,6 @@ const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
         --tok-str: #3f6b4a;
         --tok-num: #77571a;
         --tok-fn: #41597f;
-      }
-
-      :root[data-theme="dark"] {
-        color-scheme: dark;
-        --bg: #131416;
-        --alt: #1b1d20;
-        --fg: #e2e4e9;
-        --dim: #8a8f98;
-        --border: #2a2d31;
-        --accent: #dd9b78;
-        --ok: #7fc7a0;
-        --underline: #727982;
-        --tok-key: #dd9b78;
-        --tok-str: #a9c39a;
-        --tok-num: #d9c07a;
-        --tok-fn: #9fb6d9;
       }
 
       * { box-sizing: border-box; }
@@ -178,17 +153,6 @@ const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
         text-decoration: underline;
         text-underline-offset: 3px;
       }
-
-      #theme-toggle {
-        background: none;
-        border: 0;
-        padding: 0;
-        font: inherit;
-        font-size: 13px;
-        color: var(--dim);
-        cursor: pointer;
-      }
-      #theme-toggle:hover { color: var(--accent); }
 
       a {
         color: var(--fg);
@@ -331,32 +295,11 @@ const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
           {nav.map((item) => (
             <a href={item.href} aria-current={(item.href === "/" ? path === "/" : path.startsWith(item.href)) ? "page" : undefined}>{item.label}</a>
           ))}
-          <button id="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false">dark</button>
         </nav>
       </header>
       <main>
         <slot />
       </main>
     </div>
-    <script is:inline>
-      (function () {
-        var btn = document.getElementById("theme-toggle");
-        if (!btn) return;
-        function sync() {
-          var dark = document.documentElement.getAttribute("data-theme") === "dark";
-          btn.textContent = dark ? "light" : "dark";
-          btn.setAttribute("aria-pressed", String(dark));
-          btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
-        }
-        btn.addEventListener("click", function () {
-          var next =
-            document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-          document.documentElement.setAttribute("data-theme", next);
-          localStorage.setItem("theme", next);
-          sync();
-        });
-        sync();
-      })();
-    </script>
   </body>
 </html>
