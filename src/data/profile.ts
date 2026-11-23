@@ -62,7 +62,7 @@ export const profile = {
     {
       name: "CareKicks",
       url: "https://github.com/setyanoegraha/CareKicks-FE",
-      description: "Shoe laundry marketplace featuring a Flutter mobile app for customers, a web onboarding portal for vendors, and a REST API.",
+      description: "Shoe laundry marketplace featuring a [Flutter customer app](https://github.com/setyanoegraha/CareKicks-FE), a [vendor onboarding portal](https://github.com/setyanoegraha/CareKicks-Web), and a [backend API](https://github.com/setyanoegraha/CareKicks-BE).",
       date: "2026-07",
     },
     {

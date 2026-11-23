@@ -16,6 +16,10 @@ for (const p of sorted) {
   if (lastMonth && lastMonth.key === p.date) lastMonth.items.push(p);
   else year.months.push({ key: p.date, label: MONTHS[Number(m) - 1], items: [p] });
 }
+const escapeHtml = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const linkify = (text: string) =>
+  escapeHtml(text).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 ---
 <Base>
   <h1>Projects</h1>
@@ -31,10 +35,12 @@ for (const p of sorted) {
           <ul class="list">
             {items.map((p) => (
               <li>
-                <a class="entry" href={p.url} target="_blank" rel="noopener">
-                  <span class="entry-name">{p.name}</span>
-                  <span class="entry-desc">{p.description}</span>
-                </a>
+                <div class="entry">
+                  <span class="entry-name">
+                    <a href={p.url} target="_blank" rel="noopener">{p.name}</a>
+                  </span>
+                  <span class="entry-desc" set:html={linkify(p.description)} />
+                </div>
               </li>
             ))}
           </ul>
@@ -43,3 +49,24 @@ for (const p of sorted) {
     </>
   ))}
 </Base>
+
+<style>
+  .entry-name a {
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .entry:hover .entry-name a,
+  .entry-name a:hover {
+    color: var(--accent);
+  }
+  .entry-desc :global(a) {
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-color: var(--underline);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .entry-desc :global(a:hover) {
+    color: var(--accent);
+  }
+</style>
