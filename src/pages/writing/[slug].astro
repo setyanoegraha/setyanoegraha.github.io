@@ -56,9 +56,6 @@ const htmlContent = post.content ? marked.parse(post.content) : "";
         {post.summary && <p class="post-lead">{post.summary}</p>}
       </header>
       <div class="post-content" set:html={htmlContent} />
-      <footer class="post-footer">
-        <a href="/writing">← Back to writing</a>
-      </footer>
     </article>
   )}
 
@@ -103,13 +100,6 @@ const htmlContent = post.content ? marked.parse(post.content) : "";
     }
     .post-content :global(p) {
       margin: 0 0 1.25em;
-    }
-    .post-footer {
-      margin-top: 3rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-      font-family: var(--sans);
-      font-size: 14px;
     }
   </style>
 </Base>
