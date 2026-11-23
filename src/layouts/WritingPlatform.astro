@@ -12,20 +12,24 @@ interface Props {
 const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
 ---
 <Base>
-  <h1>{repoLabel}</h1>
-  <p class="lede"><a href="/writing">← Back to writing</a></p>
-
   <div id="writing-root">
     <div id="viewer" hidden>
-      <button id="back-link" type="button">All machines</button>
+      <p class="lede">
+        <button id="back-link" type="button">← Back to {repoLabel}</button>
+      </p>
       <details id="toc-pane">
         <summary>On this page</summary>
         <nav id="toc-list"></nav>
       </details>
       <article id="article"></article>
+      <p class="article-footer-back">
+        <button class="back-link-bottom" type="button">← Back to {repoLabel}</button>
+      </p>
     </div>
 
     <div id="index">
+      <h1>{repoLabel}</h1>
+      <p class="lede"><a href="/writing">← Back to writing</a></p>
       {machines.length === 0 ? (
         <p class="empty">No machines indexed yet.</p>
       ) : (
@@ -62,17 +66,29 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
         color: var(--accent);
         text-decoration: underline;
       }
-      :global(#writing-root #back-link) {
+      :global(#writing-root #back-link),
+      :global(#writing-root .back-link-bottom) {
         background: none;
         border: 0;
         padding: 0;
-        font: inherit;
-        font-size: 14px;
-        color: var(--dim);
+        font-family: var(--sans);
+        font-size: 17px;
+        color: var(--fg);
+        text-decoration: underline;
+        text-decoration-color: var(--underline);
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
         cursor: pointer;
-        margin-bottom: 0.5rem;
       }
-      :global(#writing-root #back-link:hover) { color: var(--accent); }
+      :global(#writing-root #back-link:hover),
+      :global(#writing-root .back-link-bottom:hover) {
+        color: var(--accent);
+      }
+      :global(#writing-root .article-footer-back) {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+      }
       :global(#writing-root #toc-pane) {
         margin: 1.5rem 0;
         border-top: 1px solid var(--border);
@@ -402,16 +418,29 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
         });
       }
 
-      function showIndex() {
+      function showIndex(updateHistory = true) {
         viewerEl.hidden = true;
         indexEl.hidden = false;
         tocPane.hidden = true;
-        // Restore the platform URL without the hash
-        const platformSlug = location.pathname;
-        history.replaceState(null, "", platformSlug);
+        window.scrollTo({ top: 0, behavior: "auto" });
+        if (updateHistory) {
+          const platformSlug = location.pathname;
+          history.replaceState(null, "", platformSlug);
+        }
       }
 
-      backLink.addEventListener("click", showIndex);
+      function handleBack() {
+        if (location.hash) {
+          history.back();
+        } else {
+          showIndex();
+        }
+      }
+
+      backLink.addEventListener("click", handleBack);
+      document.querySelectorAll(".back-link-bottom").forEach((btn) => {
+        btn.addEventListener("click", handleBack);
+      });
 
       // Wire machine links
       document
@@ -419,6 +448,8 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
         .forEach((a) => {
           a.addEventListener("click", (e) => {
             e.preventDefault();
+            const targetHash = `#${a.dataset.repo}/${a.dataset.prefix ?? ""}${a.dataset.dir}`;
+            history.pushState({ machine: a.dataset.dir }, "", targetHash);
             openWriteup({
               repo: a.dataset.repo!,
               branch: a.dataset.branch!,
@@ -428,10 +459,8 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
           });
         });
 
-      // Deep-link support: /writing/vulnyx#repo/prefix/Name
-      const hash = decodeURIComponent(location.hash.slice(1));
-      if (hash && hash.includes("/")) {
-        const [repoName, ...rest] = hash.split("/");
+      function loadFromHash(h: string) {
+        const [repoName, ...rest] = h.split("/");
         const dir = rest.pop()!;
         const prefix = rest.length ? rest.join("/") + "/" : "";
         const a = [
@@ -445,6 +474,22 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
         if (a) {
           openWriteup({ repo: repoName, branch: a.dataset.branch!, dir, prefix });
         }
+      }
+
+      // Browser back/forward navigation support
+      window.addEventListener("popstate", () => {
+        const h = decodeURIComponent(location.hash.slice(1));
+        if (h && h.includes("/")) {
+          loadFromHash(h);
+        } else {
+          showIndex(false);
+        }
+      });
+
+      // Deep-link support on first load
+      const initialHash = decodeURIComponent(location.hash.slice(1));
+      if (initialHash && initialHash.includes("/")) {
+        loadFromHash(initialHash);
       }
     </script>
   </div>

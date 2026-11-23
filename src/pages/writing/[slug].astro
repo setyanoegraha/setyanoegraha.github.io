@@ -40,10 +40,11 @@ const { isPlaceholder, post } = Astro.props;
   {isPlaceholder ? (
     <article class="post-single">
       <h1>Note in preparation</h1>
-      <p class="empty">This note is currently in preparation. <a href="/writing">Return to writing</a>.</p>
+      <p class="empty">This note is currently in preparation. <a href="/writing">← Back to writing</a>.</p>
     </article>
   ) : (
     <article class="post-single">
+      <p class="lede"><a href="/writing">← Back to writing</a></p>
       <header class="post-header">
         <div class="post-meta-row">
           <span class="category-badge">{post.category}</span>
