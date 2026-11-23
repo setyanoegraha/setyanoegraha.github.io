@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { posts, type Post } from "../../data/posts";
+import { marked } from "marked";
 
 export async function getStaticPaths() {
   if (posts.length === 0) {
@@ -35,6 +36,7 @@ interface Props {
 }
 
 const { isPlaceholder, post } = Astro.props;
+const htmlContent = post.content ? marked.parse(post.content) : "";
 ---
 <Base>
   {isPlaceholder ? (
@@ -53,7 +55,7 @@ const { isPlaceholder, post } = Astro.props;
         <h1>{post.title}</h1>
         {post.summary && <p class="post-lead">{post.summary}</p>}
       </header>
-      <div class="post-content" set:html={post.content || ""} />
+      <div class="post-content" set:html={htmlContent} />
       <footer class="post-footer">
         <a href="/writing">← Back to writing</a>
       </footer>
@@ -98,6 +100,9 @@ const { isPlaceholder, post } = Astro.props;
     .post-content {
       font-size: 17.5px;
       line-height: 1.75;
+    }
+    .post-content :global(p) {
+      margin: 0 0 1.25em;
     }
     .post-footer {
       margin-top: 3rem;
