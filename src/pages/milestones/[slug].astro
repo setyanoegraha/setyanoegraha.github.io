@@ -1,0 +1,211 @@
+---
+import Base from "../../layouts/Base.astro";
+import BackIcon from "../../components/BackIcon.astro";
+import { milestones, type MilestoneDetail } from "../../data/milestones";
+import { marked } from "marked";
+
+export async function getStaticPaths() {
+  return milestones.map((milestone) => ({
+    params: { slug: milestone.slug },
+    props: { milestone },
+  }));
+}
+
+interface Props {
+  milestone: MilestoneDetail;
+}
+
+const { milestone } = Astro.props;
+const loreHtml = marked.parse(milestone.lore, { async: false });
+const buildHtml = milestone.spoiler
+  ? marked.parse(milestone.spoiler.buildNotes, { async: false })
+  : "";
+---
+<Base
+  title={`${milestone.title} · Milestones · setyanoegraha`}
+  description={milestone.summary}
+>
+  <article class="milestone-single">
+    <div class="back-row">
+      <BackIcon href="/milestones" label="Back to milestones" />
+    </div>
+
+    <header class="milestone-header">
+      <div class="milestone-meta-row">
+        <time class="milestone-date">{milestone.date}</time>
+      </div>
+      <h1>{milestone.title}</h1>
+      <p class="milestone-lead">{milestone.summary}</p>
+    </header>
+
+    <div class="milestone-content" set:html={loreHtml} />
+
+    <div class="action-links">
+      {milestone.playLinks.map((link) =>
+        link.external ? (
+          <a class="action-link external" href={link.url} target="_blank" rel="noopener">
+            {link.label}
+          </a>
+        ) : (
+          <a class="action-link" href={link.url}>
+            {link.label}
+          </a>
+        )
+      )}
+    </div>
+
+    {milestone.spoiler && (
+      <details class="spoiler-gate">
+        <summary>
+          <span class="spoiler-title">How was this machine built and solved?</span>
+          <span class="spoiler-hint">Contains spoilers</span>
+        </summary>
+        <div class="spoiler-body">
+          <div class="milestone-content" set:html={buildHtml} />
+
+          <figure class="media-figure">
+            <img
+              src={milestone.spoiler.diagram}
+              alt={`${milestone.title} architecture and escalation diagram`}
+              width={760}
+              height={milestone.spoiler.diagramHeight}
+              loading="lazy"
+            />
+            <figcaption>{milestone.spoiler.diagramCaption}</figcaption>
+          </figure>
+
+          <div class="action-links writeup-links">
+            {milestone.spoiler.writeupLinks.map((link) =>
+              link.external ? (
+                <a class="action-link external" href={link.url} target="_blank" rel="noopener">
+                  {link.label}
+                </a>
+              ) : (
+                <a class="action-link" href={link.url}>
+                  {link.label}
+                </a>
+              )
+            )}
+          </div>
+        </div>
+      </details>
+    )}
+
+    <div class="back-footer">
+      <BackIcon href="/milestones" label="Back to milestones" />
+    </div>
+  </article>
+
+  <style>
+    .milestone-single {
+      margin-top: 0.25rem;
+    }
+    .milestone-header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .milestone-meta-row {
+      margin-bottom: 0.5rem;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+    }
+    .milestone-lead {
+      font-size: 18px;
+      color: var(--dim);
+      margin: 0.5rem 0 0;
+    }
+    .milestone-content {
+      font-size: 17.5px;
+      line-height: 1.75;
+    }
+    .milestone-content :global(p) {
+      margin: 0 0 1.2em;
+    }
+    .action-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1.25rem;
+      margin-top: 1.75rem;
+      font-size: 15px;
+    }
+    .action-link {
+      color: var(--fg);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .action-link:hover {
+      color: var(--dim);
+    }
+    .action-link.external::after {
+      content: "\2197";
+      font-size: 0.75em;
+      margin-left: 0.2em;
+      color: var(--dim);
+      display: inline-block;
+      transform: translateY(-0.3em);
+    }
+    .spoiler-gate {
+      margin-top: 1.5rem;
+    }
+    .spoiler-gate > summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      min-height: 44px;
+      padding: 0.35rem 0;
+      cursor: pointer;
+      list-style: none;
+      color: var(--fg);
+      font-weight: 500;
+      font-size: 16px;
+    }
+    .spoiler-gate > summary::-webkit-details-marker {
+      display: none;
+    }
+    .spoiler-title::before {
+      content: "+ ";
+      font-family: var(--mono);
+      color: var(--dim);
+      margin-right: 0.25rem;
+    }
+    .spoiler-gate[open] .spoiler-title::before {
+      content: "- ";
+    }
+    .spoiler-hint {
+      font-family: var(--sans);
+      font-size: 13.5px;
+      font-weight: 400;
+      color: var(--dim);
+    }
+    .spoiler-gate > summary:hover .spoiler-title {
+      color: var(--dim);
+    }
+    .spoiler-body {
+      margin-top: 1.25rem;
+    }
+    .media-figure {
+      margin: 1.75rem 0 1.5rem;
+      padding: 0;
+    }
+    .media-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: transparent;
+      border: 0;
+    }
+    .media-figure figcaption {
+      margin-top: 0.6rem;
+      font-size: 13.5px;
+      color: var(--dim);
+      line-height: 1.5;
+    }
+    .writeup-links {
+      margin-top: 1.5rem;
+    }
+  </style>
+</Base>

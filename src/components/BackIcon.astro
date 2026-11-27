@@ -1,0 +1,26 @@
+---
+interface Props {
+  href?: string;
+  label: string;
+  id?: string;
+  class?: string;
+}
+
+const { href, label, id, class: extraClass } = Astro.props;
+const classes = extraClass ? `back-icon ${extraClass}` : "back-icon";
+---
+{href ? (
+  <a class={classes} id={id} href={href} aria-label={label} title={label}>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12.5 8H3.5" />
+      <path d="M7.5 4L3.5 8L7.5 12" />
+    </svg>
+  </a>
+) : (
+  <button class={classes} id={id} type="button" aria-label={label} title={label}>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12.5 8H3.5" />
+      <path d="M7.5 4L3.5 8L7.5 12" />
+    </svg>
+  </button>
+)}

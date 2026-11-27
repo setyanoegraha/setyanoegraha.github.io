@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" role="img" aria-labelledby="hmv-title hmv-desc">
+  <title id="hmv-title">HackMyVM Console vault session and encrypted download stream</title>
+  <desc id="hmv-desc">OS vault login powers four dashboard tabs while MEGA machine downloads stream through parallel decryption and chunk verification before leaving staging.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#191919" />
+    </marker>
+    <style>
+      .ink { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #191919; }
+      .dim { font: 400 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #595959; }
+      .mono { font: 500 11px ui-monospace, Menlo, Consolas, monospace; fill: #191919; }
+      .card { fill: #f9f9f9; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .soft { fill: #f1f1f1; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .line { stroke: #191919; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+      .dash { stroke: #777777; stroke-width: 1.2; stroke-dasharray: 4 3; fill: none; }
+    </style>
+  </defs>
+
+  <rect class="soft" x="12" y="20" width="182" height="82" />
+  <text class="ink" x="28" y="46">OS Secret Vault</text>
+  <text class="dim" x="28" y="66">Validated login; config</text>
+  <text class="dim" x="28" y="84">keeps username &amp; path</text>
+
+  <path class="line" d="M 194 61 L 238 61" />
+
+  <rect class="card" x="242" y="20" width="506" height="82" />
+  <text class="ink" x="258" y="46">Four-Tab Dashboard</text>
+  <text class="dim" x="258" y="68">Stats gauges  ·  379+ machine catalog &amp; flags</text>
+  <text class="dim" x="258" y="86">Upcoming releases  ·  VM creator uploads</text>
+
+  <path class="line" d="M 320 102 L 320 124 L 96 124 L 96 142" />
+
+  <rect class="card" x="12" y="146" width="174" height="68" />
+  <text class="ink" x="26" y="172">MEGA Metadata</text>
+  <text class="dim" x="26" y="192">Decrypts name &amp; size</text>
+
+  <path class="line" d="M 186 180 L 216 180" />
+
+  <rect class="card" x="220" y="146" width="192" height="68" />
+  <text class="ink" x="234" y="172">AES-128-CTR Stream</text>
+  <text class="dim" x="234" y="192">Max 2 parallel + queue</text>
+
+  <path class="line" d="M 412 180 L 444 180" />
+
+  <rect class="card" x="448" y="146" width="144" height="68" />
+  <text class="ink" x="462" y="172">Chunk MAC</text>
+  <text class="mono" x="462" y="192">.part staging</text>
+
+  <path class="line" d="M 592 180 L 624 180" />
+
+  <rect class="soft" x="628" y="146" width="120" height="68" />
+  <text class="ink" x="642" y="172">Verified</text>
+  <text class="mono" x="642" y="192">final .zip</text>
+
+  <path class="dash" d="M 520 214 L 520 234" />
+  <text class="dim" x="448" y="242">Cancel removes partial staging file</text>
+</svg>

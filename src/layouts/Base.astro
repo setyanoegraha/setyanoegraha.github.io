@@ -90,20 +90,20 @@ const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
     <style is:global>
       :root {
         color-scheme: light;
-        --bg: #faf9f5;
-        --alt: #f3f1ea;
-        --fg: #1f2023;
-        --dim: #666666;
-        --border: #e5e2d9;
-        --accent: #8a4a2f;
-        --ok: #2f6b45;
-        --underline: #9c9482;
+        --bg: #f9f9f9;
+        --alt: #f1f1f1;
+        --fg: #191919;
+        --dim: #595959;
+        --border: #e2e2e2;
+        --accent: #191919;
+        --ok: #2b6647;
+        --underline: #b0b0b0;
         --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
         --mono: "JetBrainsMono Nerd Font", "JetBrainsMono Nerd Font Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        --tok-key: #8a4a2f;
-        --tok-str: #3f6b4a;
-        --tok-num: #77571a;
-        --tok-fn: #41597f;
+        --tok-key: #191919;
+        --tok-str: #3a5a40;
+        --tok-num: #6b5328;
+        --tok-fn: #3d4f60;
       }
 
       * { box-sizing: border-box; }
@@ -154,24 +154,23 @@ const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
       .nav a { color: var(--dim); text-decoration: none; }
       .nav a:hover,
       .nav a[aria-current="page"] {
-        color: var(--accent);
-        text-decoration: underline;
-        text-underline-offset: 3px;
+        color: var(--fg);
+        font-weight: 500;
       }
 
       a {
         color: var(--fg);
-        text-decoration: underline;
-        text-decoration-color: var(--underline);
-        text-underline-offset: 3px;
-        text-decoration-thickness: 1px;
+        text-decoration: none;
+        cursor: pointer;
       }
       a:hover {
         color: var(--accent);
-        text-decoration-color: var(--accent);
+      }
+      button {
+        cursor: pointer;
       }
 
-      :where(a, button):focus-visible {
+      :where(a, button, summary):focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 3px;
       }
@@ -180,12 +179,50 @@ const fullTitle = title ?? pageTitleMap[path] ?? "setyanoegraha";
         color: var(--bg);
       }
 
-      main p a {
+      main p a,
+      .entry-desc a {
+        text-decoration: underline;
+        text-decoration-color: var(--underline);
         text-underline-offset: 4px;
         text-decoration-thickness: 1px;
         transition: color 150ms ease, text-decoration-thickness 150ms ease;
       }
-      main p a:hover { text-decoration-thickness: 2px; }
+      main p a:hover,
+      .entry-desc a:hover {
+        text-decoration-color: var(--accent);
+        text-decoration-thickness: 2px;
+      }
+
+      .back-row {
+        margin: 0 0 0.75rem;
+      }
+      .back-footer {
+        margin-top: 1.5rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border);
+      }
+      .back-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+        margin-left: -14px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--dim);
+        text-decoration: none;
+        transition: color 150ms ease, transform 150ms ease;
+      }
+      .back-icon:hover {
+        color: var(--fg);
+        transform: translateX(-2px);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .back-icon { transition: none; }
+        .back-icon:hover { transform: none; }
+      }
       main p a.ep::after,
       main p a[target="_blank"]::after,
       .entry-desc a[target="_blank"]::after {

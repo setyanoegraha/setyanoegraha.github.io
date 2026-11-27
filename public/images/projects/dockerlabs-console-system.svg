@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" role="img" aria-labelledby="dl-title dl-desc">
+  <title id="dl-title">DockerLabs Console hub-and-spoke session flow</title>
+  <desc id="dl-desc">Keyring-authenticated DockerLabs session radiating into catalog browsing, ratings and writeups, parallel container downloads, and PDF certificates.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#191919" />
+    </marker>
+    <style>
+      .ink { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #191919; }
+      .dim { font: 400 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #595959; }
+      .card { fill: #f9f9f9; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .soft { fill: #f1f1f1; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .line { stroke: #191919; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+      .spine { stroke: #191919; stroke-width: 1.4; fill: none; }
+    </style>
+  </defs>
+
+  <rect class="soft" x="12" y="84" width="156" height="82" />
+  <text class="ink" x="26" y="112">Keyring Auth</text>
+  <text class="dim" x="26" y="132">Switch accounts</text>
+  <text class="dim" x="26" y="148">mid-download</text>
+
+  <path class="line" d="M 168 125 L 204 125" />
+
+  <rect class="card" x="208" y="84" width="134" height="82" />
+  <text class="ink" x="224" y="118">DockerLabs</text>
+  <text class="dim" x="224" y="138">Spanish Session</text>
+
+  <line class="spine" x1="342" y1="125" x2="378" y2="125" />
+  <line class="spine" x1="378" y1="40" x2="378" y2="212" />
+  <path class="line" d="M 378 40 L 410 40" />
+  <path class="line" d="M 378 96 L 410 96" />
+  <path class="line" d="M 378 154 L 410 154" />
+  <path class="line" d="M 378 212 L 410 212" />
+
+  <rect class="card" x="414" y="16" width="334" height="46" />
+  <text class="ink" x="430" y="36">Máquinas Catalog</text>
+  <text class="dim" x="430" y="53">Difficulty colors, instant filter &amp; sorting</text>
+
+  <rect class="card" x="414" y="73" width="334" height="46" />
+  <text class="ink" x="430" y="93">Valoraciones &amp; Writeups</text>
+  <text class="dim" x="430" y="110">4-criteria ratings, guides &amp; pending queue</text>
+
+  <rect class="card" x="414" y="131" width="334" height="46" />
+  <text class="ink" x="430" y="151">Parallel Container Downloads</text>
+  <text class="dim" x="430" y="168">2 streams, staging files &amp; Tab paths</text>
+
+  <rect class="card" x="414" y="189" width="334" height="46" />
+  <text class="ink" x="430" y="209">Completion Certificates</text>
+  <text class="dim" x="430" y="226">Single/batch PDF or missing-step notice</text>
+</svg>

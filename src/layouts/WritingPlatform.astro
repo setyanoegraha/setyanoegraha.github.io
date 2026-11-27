@@ -1,5 +1,6 @@
 ---
 import Base from "./Base.astro";
+import BackIcon from "../components/BackIcon.astro";
 
 interface Props {
   repoName: string;
@@ -14,22 +15,24 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
 <Base>
   <div id="writing-root">
     <div id="viewer" hidden>
-      <p class="lede">
-        <button id="back-link" type="button">← Back to {repoLabel}</button>
-      </p>
+      <div class="back-row">
+        <BackIcon id="back-link" label={`Back to ${repoLabel}`} />
+      </div>
       <details id="toc-pane">
         <summary>On this page</summary>
         <nav id="toc-list"></nav>
       </details>
       <article id="article"></article>
-      <p class="article-footer-back">
-        <button class="back-link-bottom" type="button">← Back to {repoLabel}</button>
-      </p>
+      <div class="back-footer">
+        <BackIcon class="back-link-bottom" label={`Back to ${repoLabel}`} />
+      </div>
     </div>
 
     <div id="index">
+      <div class="back-row">
+        <BackIcon href="/writing" label="Back to writing" />
+      </div>
       <h1>{repoLabel}</h1>
-      <p class="lede"><a href="/writing">← Back to writing</a></p>
       {machines.length === 0 ? (
         <p class="empty">No machines indexed yet.</p>
       ) : (
@@ -45,6 +48,9 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
           ))}
         </div>
       )}
+      <div class="back-footer">
+        <BackIcon href="/writing" label="Back to writing" />
+      </div>
     </div>
 
     <style>
@@ -64,30 +70,6 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
       }
       :global(#writing-root .machines a:hover) {
         color: var(--accent);
-        text-decoration: underline;
-      }
-      :global(#writing-root #back-link),
-      :global(#writing-root .back-link-bottom) {
-        background: none;
-        border: 0;
-        padding: 0;
-        font-family: var(--sans);
-        font-size: 17px;
-        color: var(--fg);
-        text-decoration: underline;
-        text-decoration-color: var(--underline);
-        text-underline-offset: 3px;
-        text-decoration-thickness: 1px;
-        cursor: pointer;
-      }
-      :global(#writing-root #back-link:hover),
-      :global(#writing-root .back-link-bottom:hover) {
-        color: var(--accent);
-      }
-      :global(#writing-root .article-footer-back) {
-        margin-top: 3rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--border);
       }
       :global(#writing-root #toc-pane) {
         margin: 1.5rem 0;
@@ -113,7 +95,7 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
       :global(#writing-root #toc-list .toc-h2) { padding-left: 0.75rem; }
       :global(#writing-root #toc-list .toc-h3) { padding-left: 1.5rem; font-size: 13px; }
 
-      @media (min-width: 1100px) {
+      @media (min-width: 1280px) {
         :global(body:has(#viewer.open-toc) .wrap) { max-width: 48rem; }
         :global(#writing-root #toc-pane) {
           position: fixed;
@@ -129,9 +111,6 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
           border-radius: 6px;
           padding: 0.9rem 1rem;
         }
-      }
-      @media (max-width: 1099px) {
-        :global(#writing-root #toc-pane) { display: none; }
       }
 
       :global(#writing-root #article) {
@@ -344,10 +323,12 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
         const heads = [...articleEl.querySelectorAll("h1, h2, h3")];
         if (heads.length === 0) {
           tocPane.hidden = true;
+          viewerEl.classList.remove("open-toc");
           return;
         }
         tocPane.hidden = false;
-        if (window.matchMedia("(min-width: 1100px)").matches) tocPane.open = true;
+        viewerEl.classList.add("open-toc");
+        if (window.matchMedia("(min-width: 1280px)").matches) tocPane.open = true;
         for (const h of heads) {
           if (!h.id) continue;
           const a = document.createElement("a");
@@ -420,6 +401,7 @@ const { repoName, repoLabel, branch, prefix, machines } = Astro.props;
 
       function showIndex(updateHistory = true) {
         viewerEl.hidden = true;
+        viewerEl.classList.remove("open-toc");
         indexEl.hidden = false;
         tocPane.hidden = true;
         window.scrollTo({ top: 0, behavior: "auto" });

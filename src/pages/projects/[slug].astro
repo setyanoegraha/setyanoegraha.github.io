@@ -1,0 +1,171 @@
+---
+import Base from "../../layouts/Base.astro";
+import BackIcon from "../../components/BackIcon.astro";
+import { projects, type ProjectDetail } from "../../data/projects";
+import { marked } from "marked";
+
+export async function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: ProjectDetail;
+}
+
+const { project } = Astro.props;
+const htmlContent = marked.parse(project.content, { async: false });
+---
+<Base
+  title={`${project.name} · Projects · setyanoegraha`}
+  description={project.summary}
+>
+  <article class="project-single">
+    <div class="back-row">
+      <BackIcon href="/projects" label="Back to projects" />
+    </div>
+
+    <header class="project-header">
+      <div class="project-meta-row">
+        <time class="project-date">{project.date}</time>
+      </div>
+      <h1>{project.name}</h1>
+      <p class="project-lead">{project.summary}</p>
+    </header>
+
+    {project.diagram && (
+      <figure class="media-figure diagram-figure">
+        <img
+          src={project.diagram}
+          alt={`${project.name} system architecture diagram`}
+          width={760}
+          height={project.diagramHeight ?? 260}
+          loading="eager"
+          fetchpriority="high"
+        />
+        {project.diagramCaption && (
+          <figcaption>{project.diagramCaption}</figcaption>
+        )}
+      </figure>
+    )}
+
+    <div class="project-content" set:html={htmlContent} />
+
+    {project.screenshot && (
+      <figure class="media-figure screenshot-figure">
+        <img
+          src={project.screenshot}
+          alt={project.screenshotCaption ?? `${project.name} screenshot`}
+          width={project.screenshotWidth ?? 1200}
+          height={project.screenshotHeight ?? 700}
+          loading="lazy"
+        />
+        {project.screenshotCaption && (
+          <figcaption>{project.screenshotCaption}</figcaption>
+        )}
+      </figure>
+    )}
+
+    <div class="project-links">
+      {project.links.map((link) => (
+        <a class="repo-link" href={link.url} target="_blank" rel="noopener">
+          {link.label}
+        </a>
+      ))}
+    </div>
+
+    <div class="back-footer">
+      <BackIcon href="/projects" label="Back to projects" />
+    </div>
+  </article>
+
+  <style>
+    .project-single {
+      margin-top: 0.25rem;
+    }
+    .project-header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .project-meta-row {
+      margin-bottom: 0.5rem;
+    }
+    .project-date {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+    }
+    .project-lead {
+      font-size: 18px;
+      color: var(--dim);
+      margin: 0.5rem 0 0;
+    }
+    .project-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1.25rem;
+      margin-top: 2.25rem;
+      font-size: 15px;
+    }
+    .repo-link {
+      color: var(--fg);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .repo-link:hover {
+      color: var(--dim);
+    }
+    .repo-link::after {
+      content: "\2197";
+      font-size: 0.75em;
+      margin-left: 0.2em;
+      color: var(--dim);
+      display: inline-block;
+      transform: translateY(-0.3em);
+    }
+    .media-figure {
+      margin: 1.75rem 0 2.1rem;
+      padding: 0;
+    }
+    .diagram-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: transparent;
+      border: 0;
+    }
+    .screenshot-figure {
+      margin-top: 2.25rem;
+    }
+    .screenshot-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--alt);
+    }
+    .media-figure figcaption {
+      margin-top: 0.6rem;
+      font-size: 13.5px;
+      color: var(--dim);
+      line-height: 1.5;
+    }
+    .project-content {
+      font-size: 17.5px;
+      line-height: 1.75;
+    }
+    .project-content :global(h2) {
+      margin: 2rem 0 0.75rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .project-content :global(p) {
+      margin: 0 0 1.2em;
+    }
+  </style>
+</Base>

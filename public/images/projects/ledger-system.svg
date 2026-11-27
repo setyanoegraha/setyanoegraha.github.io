@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" role="img" aria-labelledby="ledger-title ledger-desc">
+  <title id="ledger-title">Ledger double-entry and hierarchy flow</title>
+  <desc id="ledger-desc">Balanced transaction postings pass a zero-sum check into a local SQLite store, then roll up along colon-separated account paths into reports and charts.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#191919" />
+    </marker>
+    <style>
+      .ink { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #191919; }
+      .dim { font: 400 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #595959; }
+      .mono { font: 500 11.5px ui-monospace, Menlo, Consolas, monospace; fill: #191919; }
+      .card { fill: #f9f9f9; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .soft { fill: #f1f1f1; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .gate { fill: #191919; rx: 14; }
+      .gate-txt { font: 600 11px ui-monospace, Menlo, Consolas, monospace; fill: #f9f9f9; }
+      .line { stroke: #191919; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+      .tree { stroke: #999999; stroke-width: 1.2; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Split equation -->
+  <text class="dim" x="12" y="24">Split entry (integer cents)</text>
+  <rect class="card" x="12" y="36" width="184" height="38" />
+  <text class="mono" x="24" y="59">+200.00  Expenses:Food</text>
+  <rect class="card" x="12" y="84" width="184" height="38" />
+  <text class="mono" x="24" y="107">-200.00  Assets:Bank</text>
+
+  <!-- Merge to zero-sum gate -->
+  <path class="tree" d="M 196 55 L 222 55 L 222 103 L 196 103" />
+  <path class="line" d="M 222 79 L 254 79" />
+  <rect class="gate" x="258" y="65" width="56" height="28" />
+  <text class="gate-txt" x="269" y="83">Σ = 0</text>
+
+  <!-- SQLite store -->
+  <path class="line" d="M 314 79 L 348 79" />
+  <rect class="soft" x="352" y="36" width="144" height="86" />
+  <text class="ink" x="368" y="62">SQLite File</text>
+  <text class="dim" x="368" y="82">Accounts &amp; txns</text>
+  <text class="dim" x="368" y="100">Signed postings</text>
+
+  <!-- Roll-up tree -->
+  <path class="line" d="M 496 79 L 534 79" />
+  <text class="dim" x="538" y="24">Colon hierarchy roll-up</text>
+  <rect class="card" x="538" y="36" width="210" height="122" />
+  <text class="mono" x="554" y="62">Assets</text>
+  <path class="tree" d="M 562 70 L 562 110 L 578 110" />
+  <path class="tree" d="M 562 86 L 578 86" />
+  <text class="mono" x="584" y="90">Assets:Bank</text>
+  <text class="mono" x="584" y="114">Assets:Bank:BCA</text>
+  <line x1="554" y1="128" x2="732" y2="128" stroke="#e2e2e2" stroke-width="1" />
+  <text class="dim" x="554" y="146">Auto-aggregates upward</text>
+
+  <!-- Bottom views strip -->
+  <path class="tree" d="M 424 122 L 424 182" />
+  <line x1="120" y1="182" x2="640" y2="182" stroke="#cfcfcf" stroke-width="1.2" />
+  <line x1="120" y1="182" x2="120" y2="196" stroke="#cfcfcf" stroke-width="1.2" />
+  <line x1="293" y1="182" x2="293" y2="196" stroke="#cfcfcf" stroke-width="1.2" />
+  <line x1="466" y1="182" x2="466" y2="196" stroke="#cfcfcf" stroke-width="1.2" />
+  <line x1="640" y1="182" x2="640" y2="196" stroke="#cfcfcf" stroke-width="1.2" />
+
+  <text class="ink" x="72" y="216">Dashboard</text>
+  <text class="dim" x="62" y="234">12m net worth</text>
+  <text class="ink" x="255" y="216">Accounts</text>
+  <text class="dim" x="242" y="234">Monthly / total</text>
+  <text class="ink" x="430" y="216">Register</text>
+  <text class="dim" x="414" y="234">Running balance</text>
+  <text class="ink" x="608" y="216">Reports</text>
+  <text class="dim" x="586" y="234">Balance &amp; trial</text>
+</svg>

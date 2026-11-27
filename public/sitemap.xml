@@ -2,7 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://setyanoegraha.com/</loc></url>
   <url><loc>https://setyanoegraha.com/projects</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/ledger</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/shellcraft</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/nyx-console</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/hackmyvm-console</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/dockerlabs-console</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/carekicks</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/osce-assessor</loc></url>
+  <url><loc>https://setyanoegraha.com/projects/hmv-cli</loc></url>
   <url><loc>https://setyanoegraha.com/milestones</loc></url>
+  <url><loc>https://setyanoegraha.com/milestones/ledger-machine</loc></url>
+  <url><loc>https://setyanoegraha.com/milestones/grenade</loc></url>
+  <url><loc>https://setyanoegraha.com/milestones/groups</loc></url>
+  <url><loc>https://setyanoegraha.com/milestones/vulnyx-writeups</loc></url>
+  <url><loc>https://setyanoegraha.com/milestones/hannah-coffee</loc></url>
+  <url><loc>https://setyanoegraha.com/milestones/dockerlabs-writeups</loc></url>
+  <url><loc>https://setyanoegraha.com/milestones/hackmyvm-writeups</loc></url>
   <url><loc>https://setyanoegraha.com/writing</loc></url>
   <url><loc>https://setyanoegraha.com/writing/vulnyx</loc></url>
   <url><loc>https://setyanoegraha.com/writing/hackmyvm</loc></url>
