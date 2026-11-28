@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 245" role="img" aria-labelledby="hc-title hc-desc">
+  <title id="hc-title">Hannah Coffee container services and escalation flow</title>
+  <desc id="hc-desc">Debian container supervised by supervisord running vsftpd on port 21 and Apache on port 80 sharing a log file, leading to debugfs ext4 inspection and cap_setuid Python root escalation.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#191919" />
+    </marker>
+    <style>
+      .ink { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #191919; }
+      .dim { font: 400 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #595959; }
+      .mono { font: 500 11px ui-monospace, Menlo, Consolas, monospace; fill: #191919; }
+      .card { fill: #f9f9f9; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .soft { fill: #f1f1f1; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .bound { fill: none; stroke: #b0b0b0; stroke-width: 1.3; stroke-dasharray: 4 4; rx: 6; }
+      .line { stroke: #191919; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+    </style>
+  </defs>
+
+  <!-- Container boundary -->
+  <rect class="bound" x="12" y="14" width="736" height="218" />
+  <text class="dim" x="26" y="34">Debian container (supervisord)</text>
+
+  <!-- Dual daemons poisoning shared log -->
+  <rect class="card" x="26" y="52" width="154" height="58" />
+  <text class="ink" x="40" y="76">vsftpd (21)</text>
+  <text class="dim" x="40" y="96">Logs client username</text>
+
+  <rect class="card" x="26" y="128" width="154" height="58" />
+  <text class="ink" x="40" y="152">Apache PHP (80)</text>
+  <text class="dim" x="40" y="172">Unsanitized include</text>
+
+  <path class="line" d="M 180 81 L 222 104" />
+  <path class="line" d="M 180 157 L 222 134" />
+
+  <!-- Shared log -> www-data -->
+  <rect class="soft" x="226" y="76" width="144" height="86" />
+  <text class="ink" x="240" y="102">Log Poisoning</text>
+  <text class="dim" x="240" y="122">Shared FTP log</text>
+  <text class="mono" x="240" y="142">→ www-data shell</text>
+
+  <path class="line" d="M 370 119 L 404 119" />
+
+  <!-- debugfs + ext4 image -->
+  <rect class="card" x="408" y="76" width="166" height="86" />
+  <text class="ink" x="422" y="102">debugfs (sudo)</text>
+  <text class="dim" x="422" y="122">64 MB ext4 disk image</text>
+  <text class="mono" x="422" y="142">→ hannah shell</text>
+
+  <path class="line" d="M 574 119 L 608 119" />
+
+  <!-- cap_setuid -->
+  <rect class="soft" x="612" y="76" width="122" height="86" />
+  <text class="ink" x="626" y="102">cap_setuid</text>
+  <text class="dim" x="626" y="122">Python binary</text>
+  <text class="mono" x="626" y="142">→ root</text>
+</svg>

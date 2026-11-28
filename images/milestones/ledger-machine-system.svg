@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 225" role="img" aria-labelledby="lm-title lm-desc">
+  <title id="lm-title">Ledger machine escalation ladder</title>
+  <desc id="lm-desc">Privilege escalation path from SimpleLedger CSV upload on port 5000 as www-data, via environment variable credentials over SSH as finance, to a custom setuid archiver overwriting sudoers for root.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#191919" />
+    </marker>
+    <style>
+      .ink { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #191919; }
+      .dim { font: 400 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #595959; }
+      .mono { font: 500 11px ui-monospace, Menlo, Consolas, monospace; fill: #191919; }
+      .card { fill: #f9f9f9; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .soft { fill: #f1f1f1; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .line { stroke: #191919; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+    </style>
+  </defs>
+
+  <rect class="soft" x="12" y="138" width="166" height="72" />
+  <text class="ink" x="26" y="162">Port 5000 (Web)</text>
+  <text class="dim" x="26" y="182">CSV multipart filename</text>
+  <text class="mono" x="26" y="198">→ shell as www-data</text>
+
+  <path class="line" d="M 178 174 L 192 174 L 192 128 L 202 128" />
+
+  <rect class="card" x="206" y="92" width="168" height="72" />
+  <text class="ink" x="220" y="116">Process Env</text>
+  <text class="dim" x="220" y="136">Encoded secret in env</text>
+  <text class="mono" x="220" y="152">→ SSH (22) as finance</text>
+
+  <path class="line" d="M 374 128 L 388 128 L 388 82 L 398 82" />
+
+  <rect class="card" x="402" y="46" width="172" height="72" />
+  <text class="ink" x="416" y="70">Setuid Archiver</text>
+  <text class="dim" x="416" y="90">Copies any file without</text>
+  <text class="dim" x="416" y="106">checking destination</text>
+
+  <path class="line" d="M 574 82 L 588 82 L 588 42 L 598 42" />
+
+  <rect class="soft" x="602" y="14" width="146" height="60" />
+  <text class="ink" x="616" y="38">Root Shell</text>
+  <text class="dim" x="616" y="58">Writes sudoers rule</text>
+
+  <text class="dim" x="12" y="34">Escalation axis: unprivileged web process → local account → arbitrary file write → root</text>
+</svg>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 225" role="img" aria-labelledby="sc-title sc-desc">
+  <title id="sc-title">Shellcraft compile-time and runtime separation</title>
+  <desc id="sc-desc">Dataset compiled into the binary at build time, followed by offline runtime parameter injection, encoding, and OSC52 terminal copy.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#191919" />
+    </marker>
+    <style>
+      .ink { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #191919; }
+      .dim { font: 400 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #595959; }
+      .mono { font: 500 11px ui-monospace, Menlo, Consolas, monospace; fill: #191919; }
+      .card { fill: #f9f9f9; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .soft { fill: #f1f1f1; stroke: #cfcfcf; stroke-width: 1.25; rx: 5; }
+      .line { stroke: #191919; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+      .bound { stroke: #b0b0b0; stroke-width: 1.3; stroke-dasharray: 4 4; }
+    </style>
+  </defs>
+
+  <!-- Boundary labels -->
+  <text class="dim" x="14" y="24">Build time</text>
+  <text class="dim" x="234" y="24">Runtime (offline, zero network)</text>
+  <line class="bound" x1="208" y1="12" x2="208" y2="210" />
+
+  <!-- Compile-time dataset -->
+  <rect class="soft" x="14" y="42" width="170" height="114" />
+  <text class="ink" x="30" y="68">Embedded Data</text>
+  <text class="dim" x="30" y="92">135 payloads</text>
+  <text class="dim" x="30" y="112">17 listeners</text>
+  <text class="dim" x="30" y="132">16 shells</text>
+
+  <path class="line" d="M 184 98 L 230 98" />
+
+  <!-- Parameter injection -->
+  <rect class="card" x="234" y="42" width="156" height="114" />
+  <text class="ink" x="250" y="68">Inject &amp; Mark</text>
+  <text class="mono" x="250" y="92">IP · Port · Shell</text>
+  <text class="dim" x="250" y="114">Tracks active values</text>
+  <text class="dim" x="250" y="132">for amber highlight</text>
+
+  <path class="line" d="M 390 98 L 422 98" />
+
+  <!-- Transform -->
+  <rect class="card" x="426" y="42" width="142" height="114" />
+  <text class="ink" x="442" y="68">Encode</text>
+  <text class="dim" x="442" y="92">None / URL</text>
+  <text class="dim" x="442" y="112">Double URL</text>
+  <text class="dim" x="442" y="132">Base64 / UTF-16</text>
+
+  <path class="line" d="M 568 98 L 600 98" />
+
+  <!-- Outputs -->
+  <rect class="card" x="604" y="42" width="142" height="52" />
+  <text class="ink" x="618" y="64">OSC52 Copy</text>
+  <text class="dim" x="618" y="82">Works over SSH</text>
+
+  <rect class="card" x="604" y="104" width="142" height="52" />
+  <text class="ink" x="618" y="126">Write to File</text>
+  <text class="dim" x="618" y="144">Save payload</text>
+
+  <!-- Listener note rail -->
+  <line x1="234" y1="184" x2="746" y2="184" stroke="#e2e2e2" stroke-width="1" />
+  <text class="dim" x="234" y="204">Synced listener command preview alongside payloads, flagging UDP caveats before copy.</text>
+</svg>
